@@ -1,49 +1,66 @@
-# CLAUDE.md — Single-File HTML Website Rules
+# CLAUDE.md — `apac-regulations`
 
-## Always Do First
-* **Invoke the `frontend-design` skill** before writing any frontend code, every session, no exceptions.
-* **Output exactly ONE self-contained `.html` file.** All HTML, CSS, and JavaScript must live in that single file. No external stylesheets, no build step, no framework bundles.
+> **Scope:** Project-level memory for the APAC financial-services regulatory research reference.
 
-# Frontend Design Standards & Best Practices
+## What this repo is
 
-You are an expert Frontend Designer/Developer. When creating UI, follow these rules:
+A **research reference** covering financial-services regulatory and technology constraints across **10 APAC markets**:
 
-## 1. Core Philosophy
-* **Sleek & Minimalist:** Aim for a premium, clean, modern feel.
-* **Light Theme Only:** The design must use a light color scheme — soft off-white or near-white backgrounds, dark neutral text, and restrained use of color. Do not produce a dark-mode variant unless explicitly asked.
-* **No AI Defaulting:** Avoid standard purple gradients, heavy drop shadows, and generic rounded-card layouts. Prefer crisp borders, hairline dividers, and subtle elevation over bloom effects.
-* **Precision Spacing:** Use a disciplined spacing scale (e.g., 4 / 8 / 12 / 16 / 24 / 32 / 48 / 64 px). No cramped layouts, no wasted white space.
+| Market | Primary Regulator(s) | Key Frameworks |
+|---|---|---|
+| Australia | APRA, ASIC, OAIC | CPS 234, CPS 230, Privacy Act |
+| China | PBOC, CBIRC, CAC | DSL, PIPL, MLPS 2.0, Cybersecurity Law |
+| Hong Kong | HKMA, SFC, PCPD | SA-2, OR-2, PDPO |
+| India | RBI, SEBI, MeitY | RBI Cyber Framework, DPDP Act 2023 |
+| Indonesia | OJK, BI, KOMINFO | OJK 11/POJK.03/2022, PDP Law (UU PDP) |
+| Japan | FSA, PPC | FISC Security Guidelines, APPI |
+| Malaysia | BNM, Securities Comm. | RMiT, PDPA |
+| Singapore | MAS, IMDA, PDPC | MAS TRM, MAS Notice 644, PDPA |
+| Taiwan | FSC, NCC | Cybersecurity Mgmt Act, PDPA |
+| Thailand | BOT, SEC | BOT Notification on IT Risk, PDPA |
 
-## 2. Styling & Layout
-* **CSS:** Use a single `<style>` block in the `<head>`. Leverage modern CSS — custom properties (CSS variables) for the color palette and spacing scale, `clamp()` for fluid typography, logical properties where appropriate.
-* **No CSS frameworks or CDNs** (no Tailwind, Bootstrap, etc.). Write clean, semantic CSS by hand.
-* **Components:** Structure markup with reusable, semantic HTML patterns (e.g., a consistent `.card`, `.button`, `.nav-item` class system). Keep class naming predictable.
-* **Layout:** Use CSS Grid and Flexbox for responsive, intentional layouts rather than absolute positioning or margin hacks.
-* **Responsiveness:** Mobile-first. Use fluid units and a small number of well-chosen breakpoints.
+## Coverage Domains (per market)
 
-## 3. Visuals & Icons
-* **Icons:** Use [Lucide](https://lucide.dev/) icons, loaded inline as SVG (copy the SVG markup directly into the HTML — do not rely on a CDN script unless necessary, and if a CDN is used, use the official Lucide CDN via a single `<script>` tag). Replace all emojis with appropriate Lucide icons.
-* **Colors (light palette):**
-  * Background: near-white (e.g., `#FAFAFA` or `#F7F7F5`)
-  * Surface: pure white (`#FFFFFF`) for cards and elevated elements
-  * Text primary: near-black (e.g., `#0A0A0A` or `#111111`)
-  * Text secondary: mid-gray (e.g., `#6B7280`)
-  * Borders/dividers: light gray (e.g., `#E5E7EB`)
-  * **Exactly ONE accent color** (e.g., a restrained blue, emerald, or warm orange) used sparingly for CTAs and highlights
-* **Typography:** Modern sans-serif system stack — `-apple-system, BlinkMacSystemFont, "Inter", "Geist", "Segoe UI", Roboto, sans-serif`. Use tight letter-spacing on headings, generous line-height (1.5–1.7) on body copy.
+For each market, structure findings under:
 
-## 4. Interaction & Motion
-* **Subtle:** Transitions should be short (150–250ms) and purposeful — smooth hover states, gentle focus rings, fade-ins for revealed content.
-* **Feedback:** Provide instant visual feedback for user actions (hover, active, focus states on every interactive element).
-* **Accessibility:** Visible focus outlines, sufficient contrast against the light background, and `prefers-reduced-motion` respected for any animation.
+1. **Data localisation** — must data be stored in-country? Which classes? Cross-border transfer rules.
+2. **System localisation** — must systems run in-country? Disaster recovery requirements.
+3. **Legal entity segregation** — must local entities have separate infra/data plane?
+4. **Cloud adoption mandates** — public cloud allowed? Notification/approval thresholds? Outsourcing rules.
+5. **Cyber & operational resilience** — incident reporting timelines, board-level accountability, third-party risk.
+6. **Identity / KYC / AML** — local KYC norms, biometric rules, AML obligations.
+7. **AI / model risk** — emerging AI governance frameworks where they exist.
 
-## 5. Coding Standards
-* **Valid HTML5:** Include `<!DOCTYPE html>`, `<meta charset>`, `<meta viewport>`, and a meaningful `<title>`.
-* **Vanilla JavaScript:** If scripting is needed, use modern vanilla JS inside a single `<script>` tag at the end of `<body>`. No jQuery, no frameworks.
-* **Semantic Markup:** Use `<header>`, `<nav>`, `<main>`, `<section>`, `<article>`, `<footer>` appropriately.
-* **Self-contained:** The file must open and render correctly by double-clicking it — no server, no build, no external dependencies beyond (optionally) the Lucide CDN and system fonts.
+## Sourcing Rules
 
-**Before finalizing any code, verify that:**
-1. The output is a single `.html` file.
-2. The theme is light (no dark backgrounds).
-3. All constraints above are met.
+- **Primary sources only** for normative text (regulator websites, gazetted notices, official English translations).
+- **Secondary sources** (Big 4 advisories, law firm bulletins) acceptable as interpretation aids — always cite alongside the primary.
+- **Date every claim** — APAC regulation moves fast; an unsourced "as of" claim ages badly.
+- **No machine translation as authoritative** — flag where only an unofficial translation is available.
+
+## What This Repo Is NOT
+
+- **Not legal advice.** Every page should make this clear in a banner.
+- **Not a snapshot in time** — must track which regulations are in force, in transition, in consultation.
+- **Not exhaustive** — focused on **financial services + cloud + cyber**. Tax, employment, consumer protection are out of scope unless they touch the above.
+
+## Structure & File Conventions
+
+- One file per market: `markets/<iso2>-<market>.md` (e.g. `markets/sg-singapore.md`).
+- Cross-market comparison tables: `compare/<dimension>.md` (e.g. `compare/data-localisation.md`).
+- Living documents: every file has a **"Last verified"** date in the front matter.
+
+## Companion Repo
+
+- The `zta-financial-institution-c4-ai` reference architecture references this repo for regional constraints. When updating regulatory facts here, consider whether the C4 reference needs a companion update.
+
+## What NOT to Do
+
+- **Don't paraphrase a regulation in a way that could be read as legal interpretation.** Quote the source, then summarise — never invert.
+- **Don't reproduce regulator text verbatim** beyond fair-use snippets — link to the primary.
+- **Don't generalise across "APAC"** — every market is materially different. Comparison tables are fine; sweeping statements are not.
+- **Don't include screenshots of paywalled content.**
+
+## When Asked to Add a Market
+
+Push back if the market doesn't have a financial-services regulator with public English-language guidance — better to keep the set tight and accurate than broad and stale.
