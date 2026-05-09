@@ -12,7 +12,7 @@
 <!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,400;1,700&family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400;1,700&family=Noto+Sans+Mono:wght@400;700&display=swap" />
 
 <!-- Open Graph -->
 <meta property="og:type"        content="article" />
@@ -102,8 +102,8 @@
     --shadow-tl: rgba(15, 23, 42, 0.3);
     --glow: rgba(180, 83, 9, 0.05);
 
-    --mono: "Ubuntu Mono", ui-monospace, "SF Mono", "JetBrains Mono", "Menlo", "Roboto Mono", monospace;
-    --sans: "Ubuntu", -apple-system, BlinkMacSystemFont, "Inter", "Geist", "Segoe UI", Roboto, sans-serif;
+    --mono: "Noto Sans Mono", ui-monospace, "SF Mono", "JetBrains Mono", "Menlo", "Roboto Mono", monospace;
+    --sans: "Noto Sans", -apple-system, BlinkMacSystemFont, "Inter", "Geist", "Segoe UI", Roboto, sans-serif;
 
     --sp-1: 4px;
     --sp-2: 8px;
@@ -165,7 +165,7 @@
     font-family: var(--sans);
     background: var(--bg);
     color: var(--ink);
-    font-size: 15px;
+    font-size: 18px;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -204,7 +204,7 @@
     align-items: center;
     gap: var(--sp-2);
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 13px;
     letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--muted);
@@ -217,7 +217,7 @@
   }
   h1.title {
     font-family: var(--sans);
-    font-size: clamp(32px, 5.2vw, 56px);
+    font-size: clamp(38px, 6.24vw, 67px);
     line-height: 1.05;
     letter-spacing: -0.02em;
     font-weight: 600;
@@ -226,7 +226,7 @@
     max-width: 22ch;
   }
   .lede {
-    font-size: clamp(16px, 1.6vw, 19px);
+    font-size: clamp(19px, 1.92vw, 23px);
     line-height: 1.55;
     color: var(--ink-soft);
     max-width: 62ch;
@@ -239,7 +239,7 @@
     border-top: 1px solid var(--rule);
     padding-top: var(--sp-4);
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 13px;
     letter-spacing: 0.08em;
     color: var(--muted);
     text-transform: uppercase;
@@ -299,7 +299,7 @@
     padding: 6px 10px;
     cursor: pointer;
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     transition: border-color 160ms ease, color 160ms ease, background 160ms ease;
@@ -318,7 +318,7 @@
   }
   .toc-label {
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 13px;
     letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--muted);
@@ -337,7 +337,7 @@
   }
   .toc ul li { flex: 0 0 auto; }
   .toc a {
-    font-size: 13px;
+    font-size: 16px;
     border-bottom: 0;
     color: var(--ink-soft);
     padding: 4px 8px;
@@ -404,7 +404,7 @@
     .intro-grid { grid-template-columns: 1.1fr 1fr; gap: var(--sp-16); }
   }
   .intro h2 {
-    font-size: 13px;
+    font-size: 16px;
     font-family: var(--mono);
     letter-spacing: 0.18em;
     text-transform: uppercase;
@@ -418,9 +418,9 @@
     background: var(--surface);
     padding: var(--sp-6);
   }
-  .legend dt { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink); margin-top: var(--sp-4); }
+  .legend dt { font-family: var(--mono); font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink); margin-top: var(--sp-4); }
   .legend dt:first-child { margin-top: 0; }
-  .legend dd { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+  .legend dd { margin: 2px 0 0; color: var(--muted); font-size: 16px; }
   .legend dt .dot {
     display: inline-block; width: 8px; height: 8px; margin-right: 8px; vertical-align: middle;
   }
@@ -445,13 +445,13 @@
   }
   .country-index {
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 13px;
     letter-spacing: 0.18em;
     color: var(--accent);
     text-transform: uppercase;
   }
   .country-name {
-    font-size: clamp(26px, 3.2vw, 38px);
+    font-size: clamp(31px, 3.84vw, 46px);
     font-weight: 600;
     letter-spacing: -0.015em;
     margin: 4px 0 0;
@@ -459,7 +459,7 @@
   }
   .country-badge {
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 13px;
     letter-spacing: 0.12em;
     color: var(--muted);
     border: 1px solid var(--rule-strong);
@@ -481,7 +481,7 @@
   .dim:last-of-type { border-bottom: 0; }
   .dim-label {
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 13px;
     letter-spacing: 0.14em;
     color: var(--muted);
     text-transform: uppercase;
@@ -504,7 +504,7 @@
   .tag {
     display: inline-block;
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--muted);
@@ -534,7 +534,7 @@
     background: var(--accent);
   }
   .implications h3 {
-    font-size: 12px;
+    font-size: 14px;
     font-family: var(--mono);
     letter-spacing: 0.16em;
     text-transform: uppercase;
@@ -548,7 +548,7 @@
   /* ---------- Comparative Matrix ---------- */
   #matrix { padding: var(--sp-16) 0; border-bottom: 1px solid var(--rule); }
   #matrix h2 {
-    font-size: clamp(26px, 3vw, 34px);
+    font-size: clamp(31px, 3.6vw, 41px);
     letter-spacing: -0.015em;
     margin: 0 0 var(--sp-3);
     font-weight: 600;
@@ -562,7 +562,7 @@
   table.matrix {
     width: 100%;
     border-collapse: collapse;
-    font-size: 13px;
+    font-size: 16px;
   }
   table.matrix th, table.matrix td {
     text-align: left;
@@ -574,7 +574,7 @@
   table.matrix th:last-child, table.matrix td:last-child { border-right: 0; }
   table.matrix thead th {
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--muted);
@@ -587,13 +587,13 @@
     color: var(--ink);
     white-space: nowrap;
   }
-  table.matrix td.country-cell span { color: var(--muted); font-weight: 400; font-family: var(--mono); font-size: 11px; margin-left: 8px; }
+  table.matrix td.country-cell span { color: var(--muted); font-weight: 400; font-family: var(--mono); font-size: 13px; margin-left: 8px; }
   .sev {
     display: inline-flex;
     align-items: center;
     gap: 8px;
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 13px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
   }
@@ -611,7 +611,7 @@
   footer {
     padding: var(--sp-12) 0 var(--sp-16);
     color: var(--muted);
-    font-size: 13px;
+    font-size: 16px;
   }
   footer .row {
     display: flex;
@@ -625,7 +625,7 @@
 
   /* ---------- Utility ---------- */
   .hairline { height: 1px; background: var(--rule); margin: var(--sp-12) 0; }
-  .small { font-size: 12px; color: var(--muted); }
+  .small { font-size: 14px; color: var(--muted); }
 
   /* ===== FLAGS ========================================================= */
   .flag {
@@ -665,7 +665,7 @@
     border-bottom: 1px solid var(--rule);
   }
   .vs h2 {
-    font-size: clamp(26px, 3vw, 34px);
+    font-size: clamp(31px, 3.6vw, 41px);
     letter-spacing: -0.015em;
     margin: 0 0 var(--sp-3);
     font-weight: 600;
@@ -686,7 +686,7 @@
     background: var(--surface-sunk);
     border-bottom: 1px solid var(--rule);
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--muted);
@@ -718,7 +718,7 @@
   .mini-sev-pips:hover .pip { transform: scaleY(1.4); }
   .mini-sev-label {
     font-family: var(--mono);
-    font-size: 9px;
+    font-size: 11px;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--muted);
@@ -734,7 +734,7 @@
   .hm > * {
     background: var(--surface);
     padding: 12px 14px;
-    font-size: 12px;
+    font-size: 14px;
     min-height: 48px;
     display: flex;
     align-items: center;
@@ -742,7 +742,7 @@
   .hm .corner, .hm .colh {
     background: var(--surface-sunk);
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--muted);
@@ -756,14 +756,14 @@
   .hm .rowh small {
     color: var(--muted);
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 400;
     letter-spacing: 0.08em;
   }
   .hm .cell {
     color: #FFFFFF;
     font-family: var(--mono);
-    font-size: 9px;
+    font-size: 11px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     font-weight: 700;
@@ -791,7 +791,7 @@
     color: var(--tip-fg);
     padding: 6px 10px;
     font-family: var(--sans);
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 500;
     letter-spacing: 0;
     text-transform: none;
@@ -817,7 +817,7 @@
   .hm-toggle { display: inline-flex; gap: 4px; }
   .hm-toggle button {
     font-family: var(--mono);
-    font-size: 9px;
+    font-size: 11px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     padding: 5px 9px;
@@ -842,7 +842,7 @@
     background: var(--surface);
     border-top: 1px solid var(--rule);
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--muted);
@@ -864,7 +864,7 @@
   .tl-svg .tick { stroke: var(--rule); stroke-width: 1; }
   .tl-svg .year-label {
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.1em;
     fill: var(--muted);
     text-transform: uppercase;
@@ -877,12 +877,12 @@
   .tl-svg .event-line { stroke-width: 1; opacity: 0.5; }
   .tl-svg .event-label {
     font-family: var(--sans);
-    font-size: 10px;
+    font-size: 12px;
     fill: var(--ink);
   }
   .tl-svg .event-ctry {
     font-family: var(--mono);
-    font-size: 9px;
+    font-size: 11px;
     letter-spacing: 0.1em;
     fill: var(--muted);
     text-transform: uppercase;
@@ -896,7 +896,7 @@
   }
   .comp-chip {
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 13px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     padding: 7px 12px;
@@ -921,7 +921,7 @@
   .comp-chip[disabled]:hover { border-color: var(--rule-strong); color: var(--ink); }
   .comp-counter {
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.14em;
     color: var(--accent);
   }
@@ -938,7 +938,7 @@
   .comp-dim:last-child { border-bottom: 0; }
   .comp-dim-label {
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 13px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--ink);
@@ -962,7 +962,7 @@
   }
   .comp-bar-ctry {
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.14em;
     color: var(--ink);
     font-weight: 600;
@@ -985,7 +985,7 @@
   .comp-bar-fill[data-sev="0"] { background: var(--rule-strong); }
   .comp-bar-sev {
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     text-align: right;
@@ -999,7 +999,7 @@
     text-align: center;
     color: var(--muted);
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 13px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
   }
@@ -1046,7 +1046,7 @@
     padding: var(--sp-4) var(--sp-8);
     border-top: 1px solid var(--rule);
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--muted);
@@ -1077,7 +1077,7 @@
   }
   #glossary .gloss-filter button {
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     padding: 6px 11px;
@@ -1119,7 +1119,7 @@
     background: transparent;
     color: var(--ink);
     font-family: var(--sans);
-    font-size: 14px;
+    font-size: 17px;
     padding: 2px 0;
   }
   .gloss-search input::placeholder { color: var(--muted-2); }
@@ -1135,13 +1135,13 @@
   }
   .gloss-group-num {
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 13px;
     letter-spacing: 0.18em;
     color: var(--accent);
     text-transform: uppercase;
   }
   .gloss-group-title {
-    font-size: clamp(18px, 2vw, 22px);
+    font-size: clamp(22px, 2.4vw, 26px);
     font-weight: 600;
     letter-spacing: -0.01em;
     margin: 0;
@@ -1149,7 +1149,7 @@
   .gloss-group-count {
     margin-left: auto;
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.14em;
     color: var(--muted);
     text-transform: uppercase;
@@ -1185,14 +1185,14 @@
   }
   .gloss-abbr {
     font-family: var(--mono);
-    font-size: 13px;
+    font-size: 16px;
     font-weight: 700;
     letter-spacing: 0.04em;
     color: var(--ink);
   }
   .gloss-jur {
     font-family: var(--mono);
-    font-size: 9px;
+    font-size: 11px;
     letter-spacing: 0.16em;
     color: var(--muted);
     text-transform: uppercase;
@@ -1201,12 +1201,12 @@
     background: var(--surface-sunk);
   }
   .gloss-name {
-    font-size: 13px;
+    font-size: 16px;
     color: var(--ink-soft);
     font-weight: 500;
   }
   .gloss-def {
-    font-size: 12px;
+    font-size: 14px;
     line-height: 1.55;
     color: var(--muted);
     margin: 2px 0 0;
@@ -1216,7 +1216,7 @@
     text-align: center;
     color: var(--muted);
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 13px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     display: none;
@@ -1232,8 +1232,8 @@
   /* ---------- Responsive tweaks ---------- */
   @media (max-width: 780px) {
     .hm { grid-template-columns: 120px repeat(4, 1fr); }
-    .hm > * { padding: 10px 8px; font-size: 11px; min-height: 40px; }
-    .hm .colh { font-size: 9px; }
+    .hm > * { padding: 10px 8px; font-size: 13px; min-height: 40px; }
+    .hm .colh { font-size: 11px; }
     .comp-dim { grid-template-columns: 1fr; gap: var(--sp-3); }
     .comp-bar { grid-template-columns: 40px 1fr 70px; }
   }
@@ -1257,7 +1257,7 @@
     color: var(--on-ink);
     z-index: 1000;
     font-family: var(--mono);
-    font-size: 12px;
+    font-size: 14px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     text-decoration: none;
@@ -1273,7 +1273,7 @@
     padding-top: var(--sp-4);
     margin-top: var(--sp-4);
     border-top: 1px solid var(--rule);
-    font-size: 13px;
+    font-size: 16px;
     color: var(--muted);
   }
   .byline b { color: var(--ink); font-weight: 600; }
@@ -1315,7 +1315,7 @@
     border-left: 3px solid var(--accent);
     background: var(--accent-soft);
     color: var(--ink-soft);
-    font-size: 13px;
+    font-size: 16px;
     line-height: 1.55;
     margin-bottom: var(--sp-8);
   }
@@ -1344,7 +1344,7 @@
   .takeaways h3 {
     grid-column: 1 / -1;
     margin: 0 0 var(--sp-2);
-    font-size: 12px;
+    font-size: 14px;
     font-family: var(--mono);
     letter-spacing: 0.16em;
     text-transform: uppercase;
@@ -1372,11 +1372,11 @@
   .cta-text { max-width: 56ch; }
   .cta-text h3 {
     margin: 0 0 var(--sp-2);
-    font-size: 15px;
+    font-size: 18px;
     letter-spacing: -0.005em;
     color: var(--ink);
   }
-  .cta-text p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
+  .cta-text p { margin: 0; color: var(--muted); font-size: 17px; line-height: 1.55; }
   .cta-btn {
     flex: 0 0 auto;
     display: inline-flex;
@@ -1388,7 +1388,7 @@
     border: 1px solid var(--ink);
     text-decoration: none;
     font-family: var(--mono);
-    font-size: 12px;
+    font-size: 14px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     font-weight: 600;
@@ -4377,7 +4377,7 @@
       var c = byId[cid];
       html += '<div style="display:flex; gap:10px; align-items:flex-start;">';
       html += '<span class="comp-bar-ctry" style="min-width:46px;">' + c.code + '</span>';
-      html += '<span style="font-size:12px; color: var(--ink-soft);">' + c.anchor + '</span>';
+      html += '<span style="font-size:14px; color: var(--ink-soft);">' + c.anchor + '</span>';
       html += '</div>';
     });
     html += '  </div>';
