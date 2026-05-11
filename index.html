@@ -64,20 +64,23 @@
     --muted-2: #94A3B8;
     --rule: #E5E7EB;
     --rule-strong: #CBD5E1;
-    --accent: #B45309;          /* restrained amber / ochre */
+    --accent: #B45309;          /* restrained amber / ochre — single UI accent */
     --accent-soft: #FDF3E7;
-    --strict: #7C2D12;
-    --moderate: #B45309;
-    --light-sev: #CA8A04;
-    --none: #475569;
+    /* Severity scale — distinct hues so the heatmap reads as a true gradient
+       from hot (terracotta) → warm (amber) → cool warning (gold) → neutral (slate).
+       Data colors are intentionally outside the single-accent rule. */
+    --strict: #8C1F0E;
+    --moderate: #C2670A;
+    --light-sev: #B88906;
+    --none: #5B6478;
 
     /* Severity cell colors (heatmap) */
-    --sev-3-bg: #7C2D12;
-    --sev-2-bg: #B45309;
-    --sev-1-bg: #CA8A04;
-    --sev-0-bg: #CBD5E1;
-    --sev-1-fg: #1a1a1a;
-    --sev-0-fg: #334155;
+    --sev-3-bg: #8C1F0E;
+    --sev-2-bg: #D27607;
+    --sev-1-bg: #E5B61C;
+    --sev-0-bg: #B6BFCE;
+    --sev-1-fg: #2A1F00;
+    --sev-0-fg: #2A3140;
     --cell-text-hi: #FFFFFF;
 
     /* Warm tints (tags, flow nodes, matrix hover) */
@@ -101,6 +104,8 @@
     --shadow-heat: rgba(15, 23, 42, 0.22);
     --shadow-tl: rgba(15, 23, 42, 0.3);
     --glow: rgba(180, 83, 9, 0.05);
+    --grid-line: rgba(15, 23, 42, 0.04);
+    --grid-line-strong: rgba(15, 23, 42, 0.08);
 
     --mono: "Noto Sans Mono", ui-monospace, "SF Mono", "JetBrains Mono", "Menlo", "Roboto Mono", monospace;
     --sans: "Noto Sans", -apple-system, BlinkMacSystemFont, "Inter", "Geist", "Segoe UI", Roboto, sans-serif;
@@ -157,13 +162,22 @@
     --shadow-heat: rgba(0, 0, 0, 0.65);
     --shadow-tl: rgba(0, 0, 0, 0.55);
     --glow: rgba(245, 158, 11, 0.08);
+    --grid-line: rgba(255, 255, 255, 0.025);
+    --grid-line-strong: rgba(255, 255, 255, 0.055);
   }
 
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
   body {
     font-family: var(--sans);
-    background: var(--bg);
+    /* Body atmosphere: very faint 96px engineering-grid wash, so the doc
+       reads as drafting paper rather than a blank Word page. Each major
+       block (masthead, footer, surface cards) overlays its own background
+       and visually shifts in/out of the grid. */
+    background:
+      repeating-linear-gradient(0deg, transparent 0, transparent 95px, var(--grid-line) 95px, var(--grid-line) 96px),
+      repeating-linear-gradient(90deg, transparent 0, transparent 95px, var(--grid-line) 95px, var(--grid-line) 96px),
+      var(--bg);
     color: var(--ink);
     font-size: 18px;
     line-height: 1.6;
@@ -192,13 +206,34 @@
   }
 
   /* ---------- Masthead ---------- */
+  /* Background: drafting-paper hairline grid + soft horizon — no AI bloom.
+     Two layered backgrounds combine 24px+96px grids with a low-opacity vertical
+     fade at the top-right corner for atmospheric depth. */
   .masthead {
     border-bottom: 1px solid var(--rule);
     padding: var(--sp-16) 0 var(--sp-12);
     background:
-      radial-gradient(ellipse at 80% -20%, var(--glow), transparent 50%),
+      linear-gradient(180deg, rgba(15,23,42,0.025) 0%, transparent 220px),
+      repeating-linear-gradient(0deg, transparent 0, transparent 95px, var(--grid-line-strong) 95px, var(--grid-line-strong) 96px),
+      repeating-linear-gradient(90deg, transparent 0, transparent 95px, var(--grid-line-strong) 95px, var(--grid-line-strong) 96px),
+      repeating-linear-gradient(0deg, transparent 0, transparent 23px, var(--grid-line) 23px, var(--grid-line) 24px),
+      repeating-linear-gradient(90deg, transparent 0, transparent 23px, var(--grid-line) 23px, var(--grid-line) 24px),
       var(--bg);
+    position: relative;
+    overflow: hidden;
   }
+  /* Corner technical marks — like architectural drawing registration marks */
+  .masthead::before, .masthead::after {
+    content: "";
+    position: absolute;
+    width: 18px; height: 18px;
+    border: 1.5px solid var(--accent);
+    opacity: 0.35;
+    pointer-events: none;
+  }
+  .masthead::before { top: 22px; left: 22px; border-right: 0; border-bottom: 0; }
+  .masthead::after  { top: 22px; right: 22px; border-left: 0; border-bottom: 0; }
+  .masthead .shell { position: relative; z-index: 1; }
   .eyebrow {
     display: inline-flex;
     align-items: center;
@@ -213,17 +248,96 @@
   .eyebrow::before {
     content: "";
     display: inline-block;
-    width: 18px; height: 1px; background: var(--accent);
+    width: 24px; height: 2px; background: var(--accent);
   }
   h1.title {
     font-family: var(--sans);
-    font-size: clamp(38px, 6.24vw, 67px);
-    line-height: 1.05;
-    letter-spacing: -0.02em;
-    font-weight: 600;
+    font-size: clamp(40px, 7.4vw, 84px);
+    line-height: 1.0;
+    letter-spacing: -0.028em;
+    font-weight: 700;
     margin: 0 0 var(--sp-6);
     color: var(--ink);
     max-width: 22ch;
+  }
+  /* Tilde dash separator before/after H1 — typographic punctuation that
+     evokes editorial briefs, not generic blog posts. */
+  h1.title .accent {
+    color: var(--accent);
+    font-weight: 700;
+  }
+  /* Hero stats strip — magazine "by the numbers" callout under the lede.
+     Big mono numerals, separated by hairlines, with caption + sub-caption.
+     Sits between H1/lede and the meta-row to give the masthead an anchor. */
+  .hero-stats {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    margin: var(--sp-8) 0 var(--sp-8);
+    border-top: 2px solid var(--ink);
+    border-bottom: 1px solid var(--rule);
+  }
+  @media (min-width: 640px) {
+    .hero-stats { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (min-width: 960px) {
+    .hero-stats { grid-template-columns: repeat(4, 1fr); }
+  }
+  .hero-stat {
+    padding: var(--sp-6) var(--sp-6) var(--sp-6) 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    position: relative;
+  }
+  /* Hairline separator between adjacent stat blocks (right edge on all but last column) */
+  @media (min-width: 640px) {
+    .hero-stat:nth-child(2n) { padding-right: 0; }
+    .hero-stat:nth-child(2n)::before {
+      content: ""; position: absolute; top: var(--sp-4); bottom: var(--sp-4); left: -1px; width: 1px;
+      background: var(--rule);
+    }
+  }
+  @media (min-width: 960px) {
+    .hero-stat { padding-right: var(--sp-6); }
+    .hero-stat::before {
+      content: ""; position: absolute; top: var(--sp-4); bottom: var(--sp-4); left: -1px; width: 1px;
+      background: var(--rule);
+    }
+    .hero-stat:first-child::before { display: none; }
+    .hero-stat:nth-child(2n)::before { display: block; }
+  }
+  .hs-num {
+    font-family: var(--mono);
+    font-size: clamp(40px, 5.4vw, 60px);
+    font-weight: 700;
+    line-height: 1.0;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    display: inline-flex;
+    align-items: baseline;
+  }
+  .hs-plus {
+    font-size: 0.55em;
+    color: var(--accent);
+    margin-left: 2px;
+    font-weight: 700;
+  }
+  .hs-lbl {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+    margin-top: 6px;
+  }
+  .hs-sub {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    text-transform: none;
   }
   .lede {
     font-size: clamp(19px, 1.92vw, 23px);
@@ -430,9 +544,31 @@
   .dot.none     { background: var(--none); }
 
   /* ---------- Country sections ---------- */
+  /* CSS counter for chapter numbering — no markup changes; format 01..10 */
+  main { counter-reset: country; }
   .country {
     padding: var(--sp-16) 0 var(--sp-12);
     border-bottom: 1px solid var(--rule);
+    counter-increment: country;
+    position: relative;
+  }
+  /* Oversize editorial chapter numeral sitting beside the country header.
+     Uses absolute positioning so it visually "anchors" the section without
+     disturbing the existing 3-column country-head grid. */
+  .country::before {
+    content: counter(country, decimal-leading-zero);
+    position: absolute;
+    top: var(--sp-12);
+    right: 0;
+    font-family: var(--mono);
+    font-size: clamp(72px, 10vw, 144px);
+    font-weight: 700;
+    line-height: 0.85;
+    letter-spacing: -0.04em;
+    color: var(--accent);
+    opacity: 0.10;
+    pointer-events: none;
+    z-index: 0;
   }
   .country-head {
     display: grid;
@@ -442,30 +578,55 @@
     padding-bottom: var(--sp-6);
     border-bottom: 2px solid var(--ink);
     margin-bottom: var(--sp-8);
+    position: relative;
+    z-index: 1;
   }
   .country-index {
     font-family: var(--mono);
-    font-size: 13px;
-    letter-spacing: 0.18em;
+    font-size: 12px;
+    letter-spacing: 0.22em;
     color: var(--accent);
     text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+  }
+  .country-index::before {
+    content: counter(country, decimal-leading-zero);
+    display: inline-block;
+    background: var(--accent);
+    color: var(--on-ink);
+    padding: 2px 7px;
+    letter-spacing: 0.04em;
+    border-radius: 1px;
+  }
+  /* Hide the textual "Country 01 / 10" suffix; chip + count of-10 are clearer */
+  .country-index { font-size: 0; }
+  .country-index::before { font-size: 12px; }
+  .country-index::after {
+    content: "of 10 · APAC jurisdiction";
+    font-size: 12px;
+    letter-spacing: 0.22em;
+    color: var(--muted);
   }
   .country-name {
-    font-size: clamp(31px, 3.84vw, 46px);
-    font-weight: 600;
-    letter-spacing: -0.015em;
-    margin: 4px 0 0;
-    line-height: 1.05;
+    font-size: clamp(34px, 4.6vw, 58px);
+    font-weight: 700;
+    letter-spacing: -0.022em;
+    margin: 8px 0 0;
+    line-height: 1.0;
   }
   .country-badge {
     font-family: var(--mono);
-    font-size: 13px;
-    letter-spacing: 0.12em;
+    font-size: 12px;
+    letter-spacing: 0.16em;
     color: var(--muted);
     border: 1px solid var(--rule-strong);
-    padding: 4px 10px;
+    padding: 5px 11px;
     border-radius: 2px;
     text-transform: uppercase;
+    background: var(--surface);
   }
 
   .dim {
@@ -518,32 +679,76 @@
   .tag.hot { color: var(--strict); border-color: var(--tint-border-warm); background: var(--tint-strict); }
   .tag.flux { color: var(--accent); border-color: var(--tint-border-warm); background: var(--accent-soft); }
 
-  /* ---------- Architectural Implications Callout ---------- */
+  /* ---------- Architectural Implications Callout ----------
+     Editorial pull-quote treatment: corner brackets (architectural drawing
+     style), mono caption header with hairline ribbon, light tint background. */
   .implications {
     margin-top: var(--sp-8);
-    border: 1px solid var(--rule);
     background: var(--surface);
-    padding: var(--sp-6) var(--sp-8);
+    padding: var(--sp-8) var(--sp-8) var(--sp-6);
     position: relative;
+    border: 0;
+    box-shadow:
+      inset 0 0 0 1px var(--rule),
+      inset 0 4px 0 0 var(--ink);
   }
-  .implications::before {
+  /* Corner registration marks at the four corners — replaces the flat left
+     accent border with a more deliberate "spec sheet" aesthetic. */
+  .implications::before,
+  .implications::after {
     content: "";
     position: absolute;
-    top: 0; left: 0;
-    width: 3px; height: 100%;
-    background: var(--accent);
+    width: 14px; height: 14px;
+    border: 1.5px solid var(--accent);
+    pointer-events: none;
+  }
+  .implications::before {
+    top: -1px; left: -1px;
+    border-right: 0; border-bottom: 0;
+  }
+  .implications::after {
+    bottom: -1px; right: -1px;
+    border-left: 0; border-top: 0;
   }
   .implications h3 {
-    font-size: 14px;
+    font-size: 12px;
     font-family: var(--mono);
-    letter-spacing: 0.16em;
+    letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: var(--ink);
+    color: var(--accent);
     margin: 0 0 var(--sp-4);
-    font-weight: 600;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
-  .implications ol { margin: 0; padding-left: 20px; }
-  .implications li { margin-bottom: 8px; color: var(--ink-soft); }
+  .implications h3::before {
+    content: "§";
+    font-family: var(--sans);
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0;
+    color: var(--ink);
+  }
+  .implications ol { margin: 0; padding-left: 22px; counter-reset: imp; list-style: none; }
+  .implications li {
+    margin-bottom: 10px;
+    color: var(--ink-soft);
+    counter-increment: imp;
+    position: relative;
+  }
+  .implications li::before {
+    content: counter(imp, decimal-leading-zero);
+    position: absolute;
+    left: -28px;
+    top: 1px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .implications li:last-child { margin-bottom: 0; }
 
   /* ---------- Comparative Matrix ---------- */
   #matrix { padding: var(--sp-16) 0; border-bottom: 1px solid var(--rule); }
@@ -608,20 +813,73 @@
   .sev.none          { color: var(--none); }
 
   /* ---------- Footer ---------- */
+  /* Technical-spec footer treatment: drafting grid wash + corner marks
+     echo the masthead. The block reads as the closing register of the brief. */
   footer {
-    padding: var(--sp-12) 0 var(--sp-16);
+    padding: var(--sp-16) 0 var(--sp-16);
     color: var(--muted);
-    font-size: 16px;
+    font-size: 15px;
+    line-height: 1.55;
+    position: relative;
+    margin-top: var(--sp-12);
+    background:
+      linear-gradient(180deg, transparent 0%, rgba(15,23,42,0.02) 100%),
+      repeating-linear-gradient(0deg, transparent 0, transparent 23px, var(--grid-line) 23px, var(--grid-line) 24px),
+      repeating-linear-gradient(90deg, transparent 0, transparent 23px, var(--grid-line) 23px, var(--grid-line) 24px),
+      var(--bg);
+    border-top: 2px solid var(--ink);
   }
+  footer::before, footer::after {
+    content: "";
+    position: absolute;
+    width: 18px; height: 18px;
+    border: 1.5px solid var(--accent);
+    opacity: 0.45;
+    pointer-events: none;
+  }
+  footer::before { bottom: 22px; left: 22px;  border-right: 0; border-top: 0; }
+  footer::after  { bottom: 22px; right: 22px; border-left: 0;  border-top: 0; }
   footer .row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--sp-6);
-    justify-content: space-between;
-    border-top: 1px solid var(--rule);
-    padding-top: var(--sp-6);
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--sp-8);
+    padding-top: 0;
+    border-top: 0;
+    position: relative;
   }
-  footer p { margin: 0; }
+  @media (min-width: 760px) {
+    footer .row { grid-template-columns: auto 1fr; gap: var(--sp-12); align-items: start; }
+    footer .row::before {
+      content: "END OF BRIEF";
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.24em;
+      color: var(--accent);
+      font-weight: 700;
+      text-transform: uppercase;
+      grid-column: 1 / -1;
+      padding-bottom: var(--sp-6);
+      border-bottom: 1px solid var(--rule);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    footer .row::after {
+      content: "";
+      grid-column: 1 / -1;
+      height: 1px;
+    }
+  }
+  footer p { margin: 0; max-width: 70ch; }
+  footer p:first-child {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink);
+    font-weight: 700;
+  }
+  footer a { color: var(--accent); border-bottom-color: var(--accent); }
 
   /* ---------- Utility ---------- */
   .hairline { height: 1px; background: var(--rule); margin: var(--sp-12) 0; }
@@ -1306,26 +1564,41 @@
   }
 
   /* ---------- Risk-reversal banner ---------- */
+  /* Disclaimer note — matches the architectural callout language used for
+     the Implications block: corner registration mark + mono header band. */
   .disclaimer {
     display: flex;
-    gap: var(--sp-3);
+    gap: var(--sp-4);
     align-items: flex-start;
-    padding: var(--sp-3) var(--sp-4);
-    border: 1px solid var(--rule);
-    border-left: 3px solid var(--accent);
+    padding: var(--sp-4) var(--sp-6) var(--sp-4) var(--sp-6);
     background: var(--accent-soft);
     color: var(--ink-soft);
-    font-size: 16px;
+    font-size: 15px;
     line-height: 1.55;
     margin-bottom: var(--sp-8);
+    position: relative;
+    border: 0;
+    box-shadow:
+      inset 0 0 0 1px var(--tint-border-warm),
+      inset 4px 0 0 0 var(--accent);
+  }
+  .disclaimer::before {
+    content: "";
+    position: absolute;
+    top: -1px; right: -1px;
+    width: 12px; height: 12px;
+    border: 1.5px solid var(--accent);
+    border-left: 0; border-bottom: 0;
+    pointer-events: none;
   }
   .disclaimer svg {
     flex: 0 0 auto;
-    width: 16px;
-    height: 16px;
-    margin-top: 2px;
+    width: 18px;
+    height: 18px;
+    margin-top: 1px;
     color: var(--accent);
   }
+  .disclaimer b { font-family: var(--mono); font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); display: inline-block; margin-right: 6px; font-weight: 700; }
 
   /* ---------- Regional Takeaways (above heatmap) ---------- */
   .takeaways {
@@ -1425,6 +1698,29 @@
     <p class="lede">
       A working reference for architects who must turn regulator circulars into deployment decisions. For each of 10 APAC jurisdictions: data residency, workload isolation, cross-border transfer rules, and the binding instrument behind each &mdash; plus five architectural implications you can apply this week.
     </p>
+    <!-- Hero stats — editorial "by the numbers" strip, drives instant scale. -->
+    <div class="hero-stats" aria-label="Brief at a glance">
+      <div class="hero-stat">
+        <span class="hs-num">10</span>
+        <span class="hs-lbl">Jurisdictions</span>
+        <span class="hs-sub">APAC</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hs-num">12</span>
+        <span class="hs-lbl">Dimensions</span>
+        <span class="hs-sub">Per country</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hs-num">04</span>
+        <span class="hs-lbl">Severity Tiers</span>
+        <span class="hs-sub">Strict · Mod · Light · None</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hs-num">40<span class="hs-plus">+</span></span>
+        <span class="hs-lbl">Binding Instruments</span>
+        <span class="hs-sub">Cited inline</span>
+      </div>
+    </div>
     <div class="meta-row">
       <span><b>Prepared</b> &nbsp; <time datetime="2026-04-17">17 Apr 2026</time></span>
       <span><b>Last reviewed</b> &nbsp; <time datetime="2026-04-19">19 Apr 2026</time></span>
