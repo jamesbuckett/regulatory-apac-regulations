@@ -1,26 +1,30 @@
 # apac-regulations
 
-![Scope](https://img.shields.io/badge/Scope-FinTech%20architecture%20constraints%20%C2%B7%2010%20APAC%20markets-2ea44f)
-![Format](https://img.shields.io/badge/Format-Single--page%20HTML-1f6feb)
-![License](https://img.shields.io/badge/License-MIT-blue)
+[![Scope](https://img.shields.io/badge/Scope-FinTech%20architecture%20constraints%20%C2%B7%2010%20APAC%20markets-2ea44f)](#coverage)
+[![Format](https://img.shields.io/badge/Format-Single--page%20HTML-1f6feb)](./index.html)
+[![Live](https://img.shields.io/badge/Live-apac--regulations.vercel.app-000000?logo=vercel&logoColor=white)](https://apac-regulations.vercel.app/)
+[![Last reviewed](https://img.shields.io/badge/Last%20reviewed-2026--04--19-B45309)](./VERIFICATION.md)
+[![License](https://img.shields.io/badge/License-MIT-blue)](./LICENSE)
 
-**TL;DR** — A single-page research brief on **technology architecture design constraints** imposed by financial-services regulators across **10 APAC jurisdictions**, covering **12 dimensions** per jurisdiction with binding-instrument citations. Built as a self-contained `index.html` (no build step) and deployed on Vercel.
+**TL;DR** — A single-page research brief on **technology architecture design constraints** imposed by financial-services regulators across **10 APAC jurisdictions**, covering **12 dimensions** per jurisdiction with binding-instrument citations. Plain HTML + CSS + a small block of vanilla JS for the interactive synthesis views — no framework, no build step, no external runtime dependencies. Deployed on Vercel.
 
 > **Live:** https://apac-regulations.vercel.app/
+
+![APAC FinTech Architecture brief — masthead, hero stats, severity heat map, and the start of the Indonesia jurisdiction.](./preview.png)
 
 ---
 
 ## What this repo is
 
-A static, **architect-grade reference** intended for solutions and security architects sizing up regional constraints on data residency, workload placement, cyber resilience, and AI/model risk in APAC financial services.
+A static, **architect-grade reference** for solutions and security architects sizing up regional constraints on data residency, workload placement, cyber resilience, and AI/model risk in APAC financial services.
 
 - **Audience:** solutions architects, security architects, technology risk and outsourcing leads.
-- **Form factor:** a single `index.html` — no framework, no build, no JavaScript dependencies in the runtime page.
+- **Form factor:** a single `index.html`. No framework, no build, no runtime libraries fetched at page load; just self-contained HTML, CSS, and inline vanilla JS.
 - **Tone:** primary-source citations, dated claims, no legal advice.
 
 ## What this repo is *not*
 
-- **Not legal advice.** Use as an architectural orientation; verify against the primary regulator before relying on it for compliance decisions.
+- **Not legal advice.** Use as architectural orientation; verify against the primary regulator before relying on it for compliance decisions.
 - **Not exhaustive.** Focused on **financial services + cloud + cyber + AI risk**. Tax, employment, and consumer protection are out of scope unless they touch those domains.
 - **Not a snapshot.** Claims are dated; expect drift between publication date and current state.
 
@@ -30,18 +34,20 @@ A static, **architect-grade reference** intended for solutions and security arch
 
 ### Jurisdictions (10)
 
-| Market | Primary regulator(s) |
-|---|---|
-| Australia | APRA, ASIC, OAIC |
-| China | PBOC, CBIRC, CAC |
-| Hong Kong | HKMA, SFC, PCPD |
-| India | RBI, SEBI, MeitY |
-| Indonesia | OJK, BI, KOMINFO |
-| Japan | FSA, PPC |
-| Malaysia | BNM, Securities Commission |
-| Singapore | MAS, IMDA, PDPC |
-| Taiwan | FSC, NCC |
-| Thailand | BOT, SEC |
+| # | Market | Primary regulator(s) |
+|---|---|---|
+| 01 | Indonesia | OJK, BI, KOMINFO |
+| 02 | India | RBI, SEBI, MeitY |
+| 03 | Taiwan | FSC, NCC |
+| 04 | Japan | FSA, PPC, FISC |
+| 05 | China (Mainland) | PBOC, CBIRC, CAC |
+| 06 | Hong Kong SAR | HKMA, SFC, PCPD |
+| 07 | Singapore | MAS, IMDA, PDPC |
+| 08 | Malaysia | BNM, Securities Commission |
+| 09 | Australia | APRA, ASIC, OAIC |
+| 10 | Thailand | BOT, SEC |
+
+Ordering follows the brief's editorial sequence, not alphabetical.
 
 ### Dimensions (12 per jurisdiction)
 
@@ -58,7 +64,24 @@ A static, **architect-grade reference** intended for solutions and security arch
 11. Encryption & Authentication
 12. Key Legislation
 
-Each jurisdiction also includes an **Architectural Implications** summary. The brief opens with an **At a Glance** heat map across all 10 jurisdictions and a four-tier severity scale (strict / moderate / light / none).
+Each jurisdiction closes with an **Architectural Implications** callout — five design constraints a practitioner can apply today.
+
+---
+
+## Page features
+
+Beyond the per-country sections, the brief includes synthesis views designed to be useful in a workshop or design review:
+
+- **At a Glance heat map** — 10 × 4 severity matrix across the four topology-shaping dimensions, with sort toggles (default / strictest-first / A → Z) and per-cell anchor instruments on hover.
+- **Legislative timeline** — SVG timeline of binding instruments from 2008 → 2026.
+- **Comparative matrix** — full 10-row, 4-column table view of the same severity data.
+- **Comparison Lab** — pick up to three jurisdictions and view their binding-severity profile side by side.
+- **Decision Flow** — SVG decision tree for siting a new workload by data class, jurisdiction, and regulator posture.
+- **Glossary** — category filter (regulators / instruments & standards / architectural concepts) and live search by abbreviation, full name, or jurisdiction.
+- **Dark mode** — theme toggle persisted to `localStorage`.
+- **Sticky TOC** — left sidebar on desktop, top bar on mobile.
+
+A four-tier severity scale (**Strict · Moderate · Light · None**) underpins both the heat map and the matrix.
 
 ---
 
@@ -67,11 +90,12 @@ Each jurisdiction also includes an **Architectural Implications** summary. The b
 ```
 .
 ├── index.html        # Self-contained brief — open this to read the document
-├── screenshot.mjs    # Playwright capture: mobile / tablet / desktop full-page PNGs
-├── package.json      # Single dev dependency: playwright
-├── VERIFICATION.md   # External assessment of accuracy as of 2026-04-17
+├── preview.png       # Hero screenshot used in this README
 ├── LICENSE           # MIT
-└── CLAUDE.md         # Project memory for Claude Code (git-ignored)
+├── README.md
+├── VERIFICATION.md   # Third-party accuracy check (as of 2026-04-17)
+├── screenshot.mjs    # Local helper: Playwright capture at 3 viewports (gitignored)
+└── screenshots/      # Generated full-page + sliced PNGs (gitignored)
 ```
 
 ## View it locally
@@ -87,7 +111,7 @@ No server, install, or build step is required.
 
 ## Capture screenshots
 
-The `screenshot.mjs` helper renders the page at three viewports and writes full-page PNGs to `./screenshots/`.
+The `screenshot.mjs` helper (kept local, gitignored) renders the page at three viewports and writes full-page PNGs to `./screenshots/`.
 
 ```bash
 npm install                # one-time: installs playwright
