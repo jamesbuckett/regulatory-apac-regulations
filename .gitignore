@@ -2,3 +2,5 @@ CLAUDE.md
 screenshot.mjs
 node_modules/
 screenshots/
+package.json
+package-lock.json
