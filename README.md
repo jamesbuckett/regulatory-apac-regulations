@@ -1,5 +1,7 @@
 # APAC FinTech Technology Architecture Design Constraints — Research Brief
 
+![Description](https://img.shields.io/badge/Research-FinTech%20Architecture%20Constraints%20across%2010%20APAC%20markets-2ea44f)
+
 You are a **senior Front-End Developer and FinTech Solutions Architect** with deep expertise in APAC financial regulation, cloud architecture, and web standards.
 
 ## Your Task
@@ -33,4 +35,45 @@ For each country, cover **ALL** of the dimensions below. Where a country has no 
 
 ### **4. Legal Entity Segregation Requirements**
 - Must the local business operate as a **separately incorporated legal entity** (subsidiary vs. branch)?
-- Restrictions on **shared infrast
+- Restrictions on **shared infrastructure or shared data planes** between the local entity and overseas affiliates
+- Are **intra-group data flows** treated as cross-border transfers requiring notification, consent, or approval?
+- **Local governance** expectations — resident directors, locally appointed CISO / CRO, fit-and-proper requirements
+- **Books and records** that must be maintained at the local entity level (vs. accessible from group)
+
+### **5. Cloud Adoption Mandates**
+- Is **public cloud** permitted for in-scope financial workloads? Are specific data classes (e.g. customer PII, transaction data, cryptographic key material) excluded?
+- **Notification, registration, or prior-approval** thresholds for material outsourcing to cloud providers
+- **Outsourcing risk management** rules (e.g. MAS Outsourcing Guidelines, APRA CPS 230, HKMA SA-2, RBI Outsourcing of IT Services Directions, OJK 11/POJK.03/2022)
+- **Exit, audit, and right-to-inspect** provisions regulators expect in cloud contracts
+- Restrictions on **multi-tenant architectures**, shared control planes, or hyperscaler regions outside the country
+- **Concentration risk** expectations where a single CSP supports systemically important workloads
+
+### **6. Cyber & Operational Resilience**
+- **Incident reporting timelines** (e.g. MAS — 1 hour notification for material incidents; APRA CPS 234 — 72 hours; RBI — 6 hours; HKMA — "as soon as possible")
+- **Board and senior management accountability** for cyber and operational resilience
+- **Third-party and supply-chain risk** obligations, including fourth-party visibility
+- **Operational resilience** standards (e.g. APRA CPS 230, HKMA OR-2, MAS BCM Guidelines, FSA's "operational resilience" supervisory focus)
+- **Threat-led penetration testing** or red-team mandates (e.g. HKMA iCAST, MAS AASE, BNM TLPT)
+- **Critical / important business service** definitions, impact tolerances, and RTO/RPO expectations
+
+### **7. Identity, KYC and AML Constraints**
+- **Customer due diligence (CDD)** standards — risk-based vs. prescriptive
+- Acceptable **identity evidence** and reliance on **government / national identity systems** (e.g. Aadhaar/DigiLocker, Singpass/MyInfo, MyKad, e-KTP, MyNumber, Taiwan Citizen Digital Certificate)
+- **Remote / digital onboarding** rules — video-KYC, liveness, biometric capture, and any in-person fallback requirement
+- **Biometric data** handling and storage restrictions
+- **Sanctions screening, transaction monitoring, and STR/SAR reporting** obligations and timelines
+- **Beneficial ownership** and PEP screening expectations
+- Cross-border restrictions on **transferring identity or KYC data** to group entities or shared utilities
+
+### **8. AI / Model Risk Governance**
+- **AI-specific frameworks** where they exist (e.g. MAS FEAT and Veritas, HKMA Generative AI guidance, PBOC/CAC Interim Measures for Generative AI Services, MeitY AI advisories, Japan FSA discussion papers)
+- **Model risk management** expectations for credit, fraud, AML, pricing, and capital models
+- **Explainability, fairness, and bias** obligations — including auditability of automated decisions
+- **Human-in-the-loop** requirements for consequential or adverse customer decisions
+- **Training data provenance, lineage, and localisation** considerations
+- Restrictions on **cross-border model training or inference** using regulated data
+- **Generative AI / LLM-specific** constraints, including content labelling, hallucination risk controls, and prompt/output logging
+
+---
+
+> **Note:** This brief is a research scope, not legal advice. All findings must be sourced to primary regulator material and dated — see `CLAUDE.md` for sourcing rules.
