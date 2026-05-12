@@ -1,79 +1,124 @@
-# APAC FinTech Technology Architecture Design Constraints — Research Brief
+# apac-regulations
 
-![Description](https://img.shields.io/badge/Research-FinTech%20Architecture%20Constraints%20across%2010%20APAC%20markets-2ea44f)
+![Scope](https://img.shields.io/badge/Scope-FinTech%20architecture%20constraints%20%C2%B7%2010%20APAC%20markets-2ea44f)
+![Format](https://img.shields.io/badge/Format-Single--page%20HTML-1f6feb)
+![License](https://img.shields.io/badge/License-MIT-blue)
 
-You are a **senior Front-End Developer and FinTech Solutions Architect** with deep expertise in APAC financial regulation, cloud architecture, and web standards.
+**TL;DR** — A single-page research brief on **technology architecture design constraints** imposed by financial-services regulators across **10 APAC jurisdictions**, covering **12 dimensions** per jurisdiction with binding-instrument citations. Built as a self-contained `index.html` (no build step) and deployed on Vercel.
 
-## Your Task
-
-Research and present the **Technology Architecture Design Constraints** imposed by financial industry regulations and technology standards for the following 10 APAC countries/territories:
-
-> **Indonesia, India, Taiwan, Japan, China, Hong Kong, Singapore, Malaysia, Australia, Thailand**
-
-For each country, cover **ALL** of the dimensions below. Where a country has no explicit mandate for a dimension, state "No explicit mandate" and note any de facto industry practice or supervisory expectation.
+> **Live:** https://apac-regulations.vercel.app/
 
 ---
 
-## Research Dimensions
+## What this repo is
 
-### **1. Regulatory Bodies**
-- Name the primary financial regulators (e.g. MAS, APRA, RBI, OJK, FSA, CBIRC/PBOC)
-- Include official website links
-- Note the specific regulator responsible for technology risk / cyber supervision if distinct from the prudential regulator
+A static, **architect-grade reference** intended for solutions and security architects sizing up regional constraints on data residency, workload placement, cyber resilience, and AI/model risk in APAC financial services.
 
-### **2. Data Localization Mandates** *(where data must physically reside)*
-- Must customer data, transaction data, or payment data be stored **on servers physically located within the country**?
-- Are there asymmetric rules (e.g. "a copy must remain onshore" vs. "data may only exist onshore")?
-- Cross-border transfer restrictions, approval regimes, or whitelisted jurisdictions
-- Distinguish between **strict localization** (no data may leave) vs. **mirroring requirements** (a local copy must exist) vs. **conditional transfer** (transfer allowed with consent/approval)
+- **Audience:** solutions architects, security architects, technology risk and outsourcing leads.
+- **Form factor:** a single `index.html` — no framework, no build, no JavaScript dependencies in the runtime page.
+- **Tone:** primary-source citations, dated claims, no legal advice.
 
-### **3. System & Process Localization Mandates** *(where compute, processing, and operations must occur)*
-- Must **processing, clearing, or settlement systems** physically operate within the country?
-- Must **specific business processes** (e.g. payment authorization, fraud screening, customer onboarding) execute onshore?
-- Are **support, administration, or DevOps functions** required to be performed by onshore personnel or from onshore locations?
-- Disaster recovery (DR) site location mandates — must DR also be onshore, or can it be regional?
+## What this repo is *not*
 
-### **4. Legal Entity Segregation Requirements**
-- Must the local business operate as a **separately incorporated legal entity** (subsidiary vs. branch)?
-- Restrictions on **shared infrastructure or shared data planes** between the local entity and overseas affiliates
-- Are **intra-group data flows** treated as cross-border transfers requiring notification, consent, or approval?
-- **Local governance** expectations — resident directors, locally appointed CISO / CRO, fit-and-proper requirements
-- **Books and records** that must be maintained at the local entity level (vs. accessible from group)
-
-### **5. Cloud Adoption Mandates**
-- Is **public cloud** permitted for in-scope financial workloads? Are specific data classes (e.g. customer PII, transaction data, cryptographic key material) excluded?
-- **Notification, registration, or prior-approval** thresholds for material outsourcing to cloud providers
-- **Outsourcing risk management** rules (e.g. MAS Outsourcing Guidelines, APRA CPS 230, HKMA SA-2, RBI Outsourcing of IT Services Directions, OJK 11/POJK.03/2022)
-- **Exit, audit, and right-to-inspect** provisions regulators expect in cloud contracts
-- Restrictions on **multi-tenant architectures**, shared control planes, or hyperscaler regions outside the country
-- **Concentration risk** expectations where a single CSP supports systemically important workloads
-
-### **6. Cyber & Operational Resilience**
-- **Incident reporting timelines** (e.g. MAS — 1 hour notification for material incidents; APRA CPS 234 — 72 hours; RBI — 6 hours; HKMA — "as soon as possible")
-- **Board and senior management accountability** for cyber and operational resilience
-- **Third-party and supply-chain risk** obligations, including fourth-party visibility
-- **Operational resilience** standards (e.g. APRA CPS 230, HKMA OR-2, MAS BCM Guidelines, FSA's "operational resilience" supervisory focus)
-- **Threat-led penetration testing** or red-team mandates (e.g. HKMA iCAST, MAS AASE, BNM TLPT)
-- **Critical / important business service** definitions, impact tolerances, and RTO/RPO expectations
-
-### **7. Identity, KYC and AML Constraints**
-- **Customer due diligence (CDD)** standards — risk-based vs. prescriptive
-- Acceptable **identity evidence** and reliance on **government / national identity systems** (e.g. Aadhaar/DigiLocker, Singpass/MyInfo, MyKad, e-KTP, MyNumber, Taiwan Citizen Digital Certificate)
-- **Remote / digital onboarding** rules — video-KYC, liveness, biometric capture, and any in-person fallback requirement
-- **Biometric data** handling and storage restrictions
-- **Sanctions screening, transaction monitoring, and STR/SAR reporting** obligations and timelines
-- **Beneficial ownership** and PEP screening expectations
-- Cross-border restrictions on **transferring identity or KYC data** to group entities or shared utilities
-
-### **8. AI / Model Risk Governance**
-- **AI-specific frameworks** where they exist (e.g. MAS FEAT and Veritas, HKMA Generative AI guidance, PBOC/CAC Interim Measures for Generative AI Services, MeitY AI advisories, Japan FSA discussion papers)
-- **Model risk management** expectations for credit, fraud, AML, pricing, and capital models
-- **Explainability, fairness, and bias** obligations — including auditability of automated decisions
-- **Human-in-the-loop** requirements for consequential or adverse customer decisions
-- **Training data provenance, lineage, and localisation** considerations
-- Restrictions on **cross-border model training or inference** using regulated data
-- **Generative AI / LLM-specific** constraints, including content labelling, hallucination risk controls, and prompt/output logging
+- **Not legal advice.** Use as an architectural orientation; verify against the primary regulator before relying on it for compliance decisions.
+- **Not exhaustive.** Focused on **financial services + cloud + cyber + AI risk**. Tax, employment, and consumer protection are out of scope unless they touch those domains.
+- **Not a snapshot.** Claims are dated; expect drift between publication date and current state.
 
 ---
 
-> **Note:** This brief is a research scope, not legal advice. All findings must be sourced to primary regulator material and dated — see `CLAUDE.md` for sourcing rules.
+## Coverage
+
+### Jurisdictions (10)
+
+| Market | Primary regulator(s) |
+|---|---|
+| Australia | APRA, ASIC, OAIC |
+| China | PBOC, CBIRC, CAC |
+| Hong Kong | HKMA, SFC, PCPD |
+| India | RBI, SEBI, MeitY |
+| Indonesia | OJK, BI, KOMINFO |
+| Japan | FSA, PPC |
+| Malaysia | BNM, Securities Commission |
+| Singapore | MAS, IMDA, PDPC |
+| Taiwan | FSC, NCC |
+| Thailand | BOT, SEC |
+
+### Dimensions (12 per jurisdiction)
+
+1. Regulatory Bodies
+2. Data Localization
+3. System & Process Localization
+4. Legal Entity Segregation
+5. Workload Isolation & Placement
+6. Cross-Border Data Flow
+7. Cybersecurity Standards
+8. API & Open Banking
+9. Cloud & Infrastructure
+10. Licensing & Compliance Tech
+11. Encryption & Authentication
+12. Key Legislation
+
+Each jurisdiction also includes an **Architectural Implications** summary. The brief opens with an **At a Glance** heat map across all 10 jurisdictions and a four-tier severity scale (strict / moderate / light / none).
+
+---
+
+## Repository layout
+
+```
+.
+├── index.html        # Self-contained brief — open this to read the document
+├── screenshot.mjs    # Playwright capture: mobile / tablet / desktop full-page PNGs
+├── package.json      # Single dev dependency: playwright
+├── VERIFICATION.md   # External assessment of accuracy as of 2026-04-17
+├── LICENSE           # MIT
+└── CLAUDE.md         # Project memory for Claude Code (git-ignored)
+```
+
+## View it locally
+
+The page is fully self-contained — open it directly in a browser:
+
+```bash
+xdg-open index.html        # Linux
+open index.html            # macOS
+```
+
+No server, install, or build step is required.
+
+## Capture screenshots
+
+The `screenshot.mjs` helper renders the page at three viewports and writes full-page PNGs to `./screenshots/`.
+
+```bash
+npm install                # one-time: installs playwright
+npx playwright install     # one-time: fetches browser binaries
+node screenshot.mjs        # captures ./index.html by default
+node screenshot.mjs https://apac-regulations.vercel.app/   # or a URL
+```
+
+Viewports captured:
+
+| Name    | Width | Height |
+|---------|------:|-------:|
+| mobile  |   375 |    812 |
+| tablet  |   768 |   1024 |
+| desktop |  1440 |    900 |
+
+`deviceScaleFactor` is held at 1 — full-page captures of long pages otherwise overflow Chrome's max canvas (~16384 px).
+
+## Sourcing rules
+
+- **Primary sources only** for normative claims: regulator websites, gazetted notices, official English translations.
+- **Secondary sources** (Big 4, law firm bulletins) acceptable as interpretation aids, always cited alongside the primary.
+- **Every claim is dated** — APAC regulation moves fast.
+- **Machine translation is never authoritative** — flagged where only an unofficial translation is available.
+
+For a third-party correctness check, see [`VERIFICATION.md`](./VERIFICATION.md).
+
+## Disclaimer
+
+This brief is **not legal advice** and is **not a substitute for engagement with qualified counsel or the regulator**. Use it as a high-level architectural guide; verify specific requirements against the primary document repositories of the respective national regulators.
+
+## License
+
+[MIT](./LICENSE) © 2026 James Buckett
