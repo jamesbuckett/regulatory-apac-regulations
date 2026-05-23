@@ -55,20 +55,28 @@
 </script>
 <style>
   :root {
-    --bg: #F7F7F5;
+    /* Style-guide canonical tokens (one accent, neutral palette) */
+    --bg: #FAFAFA;
     --surface: #FFFFFF;
-    --surface-sunk: #FBFBF9;
-    --ink: #0F172A;
+    --surface-sunk: #F4F4F2;
+    --text: #0A0A0A;
+    --text-muted: #6B7280;
+    --border: #E5E7EB;
+    --border-strong: #D1D5DB;
+    --accent: #059669;          /* emerald — single UI accent */
+    --accent-hover: color-mix(in srgb, var(--accent) 88%, black);
+    --accent-soft: color-mix(in srgb, var(--accent) 12%, var(--bg));
+
+    /* Legacy aliases — kept so existing component CSS continues to resolve. */
+    --ink: var(--text);
     --ink-soft: #1F2937;
-    --muted: #64748B;
+    --muted: var(--text-muted);
     --muted-2: #94A3B8;
-    --rule: #E5E7EB;
-    --rule-strong: #CBD5E1;
-    --accent: #B45309;          /* restrained amber / ochre — single UI accent */
-    --accent-soft: #FDF3E7;
-    /* Severity scale — distinct hues so the heatmap reads as a true gradient
-       from hot (terracotta) → warm (amber) → cool warning (gold) → neutral (slate).
-       Data colors are intentionally outside the single-accent rule. */
+    --rule: var(--border);
+    --rule-strong: var(--border-strong);
+
+    /* Severity scale — state colors (PASS/FAIL-style gradient) deliberately
+       outside the one-accent rule. Heatmap reads hot → warm → warning → neutral. */
     --strict: #8C1F0E;
     --moderate: #C2670A;
     --light-sev: #B88906;
@@ -83,12 +91,14 @@
     --sev-0-fg: #2A3140;
     --cell-text-hi: #FFFFFF;
 
-    /* Warm tints (tags, flow nodes, matrix hover) */
+    /* Severity tints — paired with severity hues, stay warm. */
     --tint-strict: #FBF2ED;
-    --tint-accent: #FDF3E7;
     --tint-light: #FEF9E7;
-    --tint-border-warm: #E7D2C7;
     --t-light-text: #854D0E;
+
+    /* Accent-derived tints (re-derived from --accent) */
+    --tint-accent: color-mix(in srgb, var(--accent) 8%, var(--surface));
+    --tint-border-warm: color-mix(in srgb, var(--accent) 22%, var(--border));
 
     /* Surface-on-ink text (dark nodes, active chips) */
     --on-ink: #FFFFFF;
@@ -103,35 +113,49 @@
     --shadow-flag-lg: rgba(15, 23, 42, 0.08);
     --shadow-heat: rgba(15, 23, 42, 0.22);
     --shadow-tl: rgba(15, 23, 42, 0.3);
-    --glow: rgba(180, 83, 9, 0.05);
+    --glow: rgba(5, 150, 105, 0.05);
     --grid-line: rgba(15, 23, 42, 0.04);
     --grid-line-strong: rgba(15, 23, 42, 0.08);
 
     --mono: "Noto Sans Mono", ui-monospace, "SF Mono", "JetBrains Mono", "Menlo", "Roboto Mono", monospace;
     --sans: "Noto Sans", -apple-system, BlinkMacSystemFont, "Inter", "Geist", "Segoe UI", Roboto, sans-serif;
 
-    --sp-1: 4px;
-    --sp-2: 8px;
-    --sp-3: 12px;
-    --sp-4: 16px;
-    --sp-6: 24px;
-    --sp-8: 32px;
-    --sp-12: 48px;
-    --sp-16: 64px;
+    /* Canonical style-guide spacing scale (4/8/12/16/24/32/48/64/96) */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 24px;
+    --space-6: 32px;
+    --space-7: 48px;
+    --space-8: 64px;
+    --space-9: 96px;
+
+    /* Legacy spacing aliases (kept for existing references) */
+    --sp-1: var(--space-1);
+    --sp-2: var(--space-2);
+    --sp-3: var(--space-3);
+    --sp-4: var(--space-4);
+    --sp-6: var(--space-5);
+    --sp-8: var(--space-6);
+    --sp-12: var(--space-7);
+    --sp-16: var(--space-8);
   }
 
   [data-theme="dark"] {
-    --bg: #0B0F19;
-    --surface: #111726;
-    --surface-sunk: #0E1320;
-    --ink: #F1F5F9;
+    --bg: #0B0B0C;
+    --surface: #161618;
+    --surface-sunk: #0E0E10;
+    --text: #F5F5F5;
+    --text-muted: #9CA3AF;
+    --border: #27272A;
+    --border-strong: #3F3F46;
+    /* --accent inherits from :root — same emerald in both themes */
+    --accent-soft: color-mix(in srgb, var(--accent) 18%, var(--bg));
+
     --ink-soft: #CBD5E1;
-    --muted: #8B98AC;
-    --muted-2: #64748B;
-    --rule: #1E2638;
-    --rule-strong: #2D3A52;
-    --accent: #F59E0B;
-    --accent-soft: #3A2913;
+    --muted-2: #6B7280;
+
     --strict: #F87171;
     --moderate: #FB923C;
     --light-sev: #FACC15;
@@ -146,22 +170,23 @@
     --cell-text-hi: #0B0F19;
 
     --tint-strict: #2E1A16;
-    --tint-accent: #2E1F0D;
     --tint-light: #2A230B;
-    --tint-border-warm: #4C321C;
     --t-light-text: #FACC15;
+    /* Accent-derived tints — recomputed by color-mix from the inherited --accent */
+    --tint-accent: color-mix(in srgb, var(--accent) 16%, var(--surface));
+    --tint-border-warm: color-mix(in srgb, var(--accent) 30%, var(--border));
 
-    --on-ink: #0B0F19;
+    --on-ink: #0B0B0C;
 
-    --tip-bg: #F1F5F9;
-    --tip-fg: #0B0F19;
+    --tip-bg: #F5F5F5;
+    --tip-fg: #0B0B0C;
 
     --shadow-flag-border: rgba(0, 0, 0, 0.55);
     --shadow-flag-drop: rgba(0, 0, 0, 0.45);
     --shadow-flag-lg: rgba(0, 0, 0, 0.5);
     --shadow-heat: rgba(0, 0, 0, 0.65);
     --shadow-tl: rgba(0, 0, 0, 0.55);
-    --glow: rgba(245, 158, 11, 0.08);
+    --glow: rgba(16, 185, 129, 0.10);
     --grid-line: rgba(255, 255, 255, 0.025);
     --grid-line-strong: rgba(255, 255, 255, 0.055);
   }
@@ -320,7 +345,7 @@
   .hs-plus {
     font-size: 0.55em;
     color: var(--accent);
-    margin-left: 2px;
+    margin-left: 4px;
     font-weight: 700;
   }
   .hs-lbl {
@@ -330,7 +355,7 @@
     text-transform: uppercase;
     color: var(--accent);
     font-weight: 700;
-    margin-top: 6px;
+    margin-top: 8px;
   }
   .hs-sub {
     font-family: var(--mono);
@@ -406,11 +431,11 @@
   .theme-toggle {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     background: var(--surface);
     border: 1px solid var(--rule);
     color: var(--muted);
-    padding: 6px 10px;
+    padding: 8px 12px;
     cursor: pointer;
     font-family: var(--mono);
     font-size: 12px;
@@ -483,7 +508,7 @@
     .toc a {
       display: block;
       width: 100%;
-      padding: 6px 10px;
+      padding: 8px 12px;
       border-color: transparent;
       background: transparent;
       border-left: 2px solid transparent;
@@ -534,7 +559,7 @@
   }
   .legend dt { font-family: var(--mono); font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink); margin-top: var(--sp-4); }
   .legend dt:first-child { margin-top: 0; }
-  .legend dd { margin: 2px 0 0; color: var(--muted); font-size: 16px; }
+  .legend dd { margin: 4px 0 0; color: var(--muted); font-size: 16px; }
   .legend dt .dot {
     display: inline-block; width: 8px; height: 8px; margin-right: 8px; vertical-align: middle;
   }
@@ -597,7 +622,7 @@
     display: inline-block;
     background: var(--accent);
     color: var(--on-ink);
-    padding: 2px 7px;
+    padding: 4px 8px;
     letter-spacing: 0.04em;
     border-radius: 1px;
   }
@@ -623,7 +648,7 @@
     letter-spacing: 0.16em;
     color: var(--muted);
     border: 1px solid var(--rule-strong);
-    padding: 5px 11px;
+    padding: 4px 12px;
     border-radius: 2px;
     text-transform: uppercase;
     background: var(--surface);
@@ -646,7 +671,7 @@
     letter-spacing: 0.14em;
     color: var(--muted);
     text-transform: uppercase;
-    padding-top: 2px;
+    padding-top: 4px;
     margin: 0;
     font-weight: 400;
   }
@@ -657,8 +682,8 @@
     font-weight: 600;
   }
   .dim-body { color: var(--ink-soft); }
-  .dim-body ul { margin: 0; padding-left: 18px; }
-  .dim-body li { margin-bottom: 6px; }
+  .dim-body ul { margin: 0; padding-left: 16px; }
+  .dim-body li { margin-bottom: 8px; }
   .dim-body li:last-child { margin-bottom: 0; }
   .dim-body p { margin: 0 0 8px; }
 
@@ -670,9 +695,9 @@
     text-transform: uppercase;
     color: var(--muted);
     border: 1px solid var(--rule);
-    padding: 2px 6px;
+    padding: 4px 8px;
     margin-right: 4px;
-    margin-bottom: 2px;
+    margin-bottom: 4px;
     vertical-align: middle;
     background: var(--surface);
   }
@@ -720,7 +745,7 @@
     font-weight: 700;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
   }
   .implications h3::before {
     content: "§";
@@ -730,9 +755,9 @@
     letter-spacing: 0;
     color: var(--ink);
   }
-  .implications ol { margin: 0; padding-left: 22px; counter-reset: imp; list-style: none; }
+  .implications ol { margin: 0; padding-left: 24px; counter-reset: imp; list-style: none; }
   .implications li {
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     color: var(--ink-soft);
     counter-increment: imp;
     position: relative;
@@ -910,7 +935,7 @@
   .country-head > div:first-child .ch-text { display: flex; flex-direction: column; }
 
   /* TOC flags */
-  .toc a .flag { margin-right: 6px; }
+  .toc a .flag { margin-right: 8px; }
 
   /* Matrix flags */
   table.matrix td.country-cell .flag { margin-right: 8px; }
@@ -958,11 +983,11 @@
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 6px;
+    gap: 8px;
   }
   .mini-sev-pips {
     display: flex;
-    gap: 2px;
+    gap: 4px;
   }
   .mini-sev-pips .pip {
     width: 26px; height: 6px;
@@ -986,12 +1011,12 @@
   .hm {
     display: grid;
     grid-template-columns: 170px repeat(4, 1fr);
-    gap: 1px;
+    gap: 0;
     background: var(--rule);
   }
   .hm > * {
     background: var(--surface);
-    padding: 12px 14px;
+    padding: 12px 16px;
     font-size: 14px;
     min-height: 48px;
     display: flex;
@@ -1047,7 +1072,7 @@
     transform: translateX(-50%);
     background: var(--tip-bg);
     color: var(--tip-fg);
-    padding: 6px 10px;
+    padding: 8px 12px;
     font-family: var(--sans);
     font-size: 13px;
     font-weight: 500;
@@ -1078,7 +1103,7 @@
     font-size: 11px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    padding: 5px 9px;
+    padding: 4px 8px;
     border: 1px solid var(--rule);
     background: var(--surface);
     color: var(--muted);
@@ -1105,7 +1130,7 @@
     text-transform: uppercase;
     color: var(--muted);
   }
-  .hm-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .hm-legend span { display: inline-flex; align-items: center; gap: 8px; }
   .hm-legend i {
     display: inline-block;
     width: 14px; height: 10px;
@@ -1150,14 +1175,14 @@
   .comp-chips {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: 8px;
   }
   .comp-chip {
     font-family: var(--mono);
     font-size: 13px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    padding: 7px 12px;
+    padding: 8px 12px;
     border: 1px solid var(--rule-strong);
     background: var(--surface);
     color: var(--ink);
@@ -1165,7 +1190,7 @@
     transition: all 160ms ease;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
   }
   .comp-chip .dot {
     width: 8px; height: 8px;
@@ -1204,7 +1229,7 @@
   }
   .comp-dim-label .n {
     color: var(--accent);
-    margin-right: 6px;
+    margin-right: 8px;
     font-weight: 600;
   }
   .comp-dim-bars {
@@ -1215,7 +1240,7 @@
   .comp-bar {
     display: grid;
     grid-template-columns: 46px 1fr 88px;
-    gap: 10px;
+    gap: 12px;
     align-items: center;
   }
   .comp-bar-ctry {
@@ -1310,7 +1335,7 @@
     color: var(--muted);
     background: var(--surface-sunk);
   }
-  .flow-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .flow-legend span { display: inline-flex; align-items: center; gap: 8px; }
   .flow-legend i {
     display: inline-block;
     width: 14px; height: 10px;
@@ -1330,7 +1355,7 @@
   #glossary .gloss-filter {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: 8px;
     margin-bottom: var(--sp-6);
   }
   #glossary .gloss-filter button {
@@ -1338,7 +1363,7 @@
     font-size: 12px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    padding: 6px 11px;
+    padding: 8px 12px;
     border: 1px solid var(--rule);
     background: var(--surface);
     color: var(--muted);
@@ -1356,7 +1381,7 @@
     align-items: center;
     gap: var(--sp-3);
     margin-bottom: var(--sp-8);
-    padding: 10px var(--sp-4);
+    padding: 12px var(--sp-4);
     border: 1px solid var(--rule);
     background: var(--surface);
     max-width: 520px;
@@ -1378,7 +1403,7 @@
     color: var(--ink);
     font-family: var(--sans);
     font-size: 17px;
-    padding: 2px 0;
+    padding: 4px 0;
   }
   .gloss-search input::placeholder { color: var(--muted-2); }
   .gloss-group { margin-bottom: var(--sp-12); }
@@ -1415,7 +1440,7 @@
   .gloss-grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 1px;
+    gap: 0;
     background: var(--rule);
     border: 1px solid var(--rule);
   }
@@ -1430,7 +1455,7 @@
     padding: var(--sp-4) var(--sp-6);
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
     transition: background 160ms ease;
   }
   .gloss-item:hover { background: var(--tint-accent); }
@@ -1454,7 +1479,7 @@
     letter-spacing: 0.16em;
     color: var(--muted);
     text-transform: uppercase;
-    padding: 2px 6px;
+    padding: 4px 8px;
     border: 1px solid var(--rule);
     background: var(--surface-sunk);
   }
@@ -1467,7 +1492,7 @@
     font-size: 14px;
     line-height: 1.55;
     color: var(--muted);
-    margin: 2px 0 0;
+    margin: 4px 0 0;
   }
   .gloss-empty {
     padding: var(--sp-12) 0;
@@ -1483,14 +1508,14 @@
   mark.gloss-hit {
     background: var(--accent-soft);
     color: var(--accent);
-    padding: 0 2px;
+    padding: 0 4px;
     border-radius: 1px;
   }
 
   /* ---------- Responsive tweaks ---------- */
   @media (max-width: 780px) {
     .hm { grid-template-columns: 120px repeat(4, 1fr); }
-    .hm > * { padding: 10px 8px; font-size: 13px; min-height: 40px; }
+    .hm > * { padding: 12px 8px; font-size: 13px; min-height: 40px; }
     .hm .colh { font-size: 11px; }
     .comp-dim { grid-template-columns: 1fr; gap: var(--sp-3); }
     .comp-bar { grid-template-columns: 40px 1fr 70px; }
@@ -1542,10 +1567,10 @@
   .byline-social a {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     color: var(--muted);
     border-bottom: none;
-    padding: 2px 0;
+    padding: 4px 0;
   }
   .byline-social a:hover,
   .byline-social a:focus-visible {
@@ -1595,10 +1620,10 @@
     flex: 0 0 auto;
     width: 18px;
     height: 18px;
-    margin-top: 1px;
+    margin-top: 0;
     color: var(--accent);
   }
-  .disclaimer b { font-family: var(--mono); font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); display: inline-block; margin-right: 6px; font-weight: 700; }
+  .disclaimer b { font-family: var(--mono); font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); display: inline-block; margin-right: 8px; font-weight: 700; }
 
   /* ---------- Regional Takeaways (above heatmap) ---------- */
   .takeaways {
@@ -1624,7 +1649,7 @@
     color: var(--ink);
     font-weight: 600;
   }
-  .takeaways ul { margin: 0; padding-left: 20px; color: var(--ink-soft); }
+  .takeaways ul { margin: 0; padding-left: 24px; color: var(--ink-soft); }
   .takeaways li { margin-bottom: var(--sp-3); line-height: 1.55; }
   .takeaways li:last-child { margin-bottom: 0; }
   .takeaways b { color: var(--ink); font-weight: 600; }
