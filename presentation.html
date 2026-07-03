@@ -1,0 +1,1989 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>APAC FinTech Architecture — 10 Jurisdictions, 12 Constraints Each</title>
+  <meta name="description" content="Architect-grade reference on data residency, workload isolation, and cyber rules across 10 APAC jurisdictions — with binding citations.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Noto+Sans+Mono&display=swap" rel="stylesheet">
+
+  <style>
+    /* ------------------------------------------------------------------
+       Design tokens — identical to skill-style-guide's palette and spacing
+       contract. Edit values only by syncing with that skill's template;
+       this deck must stay token-compatible. Swap --accent to one of the
+       curated alternatives; do not introduce a second accent.
+       ------------------------------------------------------------------ */
+    :root {
+      /* Light palette (default) */
+      --bg: #FAFAFA;
+      --surface: #FFFFFF;
+      --text: #0A0A0A;
+      --text-muted: #6B7280;
+      --border: #E5E7EB;
+      --border-strong: #D1D5DB;
+
+      /* Pick exactly ONE accent. Alternatives commented for reference. */
+      /* --accent: #2563EB; */  /* restrained blue */
+      /* --accent: #4F46E5; */  /* indigo (default) */
+      --accent: #059669;        /* emerald — matches the source page */
+      /* --accent: #EA580C; */  /* warm orange */
+      --accent-hover: color-mix(in srgb, var(--accent) 88%, black);
+      --accent-soft: color-mix(in srgb, var(--accent) 12%, var(--bg));
+
+      /* Categorical (data-viz) palette. ROYGBIV for charts, multi-series
+         diagrams, or taxonomy badges only. Do NOT use for CTAs, headings,
+         links, or chrome — the one-accent rule above still applies. */
+      --cat-1: #DC2626;  /* red */
+      --cat-2: #EA580C;  /* orange */
+      --cat-3: #CA8A04;  /* yellow */
+      --cat-4: #16A34A;  /* green */
+      --cat-5: #2563EB;  /* blue */
+      --cat-6: #4F46E5;  /* indigo */
+      --cat-7: #7C3AED;  /* violet */
+
+      /* Severity state scale — mirrored from the source page's heat map.
+         Genuine-state use only (Strict/Moderate/Light/None ratings). */
+      --sev-strict: #8C1F0E;
+      --sev-moderate: #C2670A;
+      --sev-light: #B88906;
+      --sev-none: #5B6478;
+
+      /* Spacing scale: 4 / 8 / 12 / 16 / 24 / 32 / 48 / 64 / 96 */
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 24px;
+      --space-6: 32px;
+      --space-7: 48px;
+      --space-8: 64px;
+      --space-9: 96px;
+
+      /* Type */
+      --font-sans: "Noto Sans", -apple-system, BlinkMacSystemFont, "Inter", "Geist", "Segoe UI", Roboto, sans-serif;
+      --font-mono: "Noto Sans Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      /* Deck type ramp — sized for the fixed 1280x720 design space, which
+         the stage scales as one unit. Do not use viewport-relative units
+         inside slides; they would fight the stage scaling. */
+      --fs-deck-h1: 64px;
+      --fs-deck-h2: 44px;
+      --fs-deck-h3: 30px;
+      --fs-deck-body: 24px;
+      --fs-deck-small: 18px;
+      --fs-deck-mono: 20px;
+      --leading-body: 1.5;
+      --leading-tight: 1.15;
+      --tracking-tight: -0.02em;
+
+      /* Layout */
+      --radius: 8px;
+      --radius-lg: 12px;
+      --shadow-sm: 0 1px 2px rgba(10, 10, 10, 0.04);
+      --shadow: 0 1px 3px rgba(10, 10, 10, 0.06), 0 1px 2px rgba(10, 10, 10, 0.04);
+      --transition: 180ms ease;
+      --transition-slide: 200ms ease;
+
+      /* 16:9 design space. The engine scales this to fit the viewport. */
+      --deck-w: 1280px;
+      --deck-h: 720px;
+    }
+
+    [data-theme="dark"] {
+      --bg: #0B0B0C;
+      --surface: #161618;
+      --text: #F5F5F5;
+      --text-muted: #9CA3AF;
+      --border: #27272A;
+      --border-strong: #3F3F46;
+      --accent-soft: color-mix(in srgb, var(--accent) 18%, var(--bg));
+      /* Categorical palette — lifted for near-black backgrounds. */
+      --cat-1: #F87171;
+      --cat-2: #FB923C;
+      --cat-3: #FACC15;
+      --cat-4: #4ADE80;
+      --cat-5: #60A5FA;
+      --cat-6: #818CF8;
+      --cat-7: #A78BFA;
+      /* Severity scale — lifted for near-black backgrounds (source page's dark values). */
+      --sev-strict: #F87171;
+      --sev-moderate: #FB923C;
+      --sev-light: #FACC15;
+      --sev-none: #94A3B8;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+      --shadow: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    /* ------------------------------------------------------------------
+       Reset and base
+       ------------------------------------------------------------------ */
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      overflow: hidden; /* the stage is the viewport; overlays scroll internally */
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      font-size: var(--fs-deck-body);
+      line-height: var(--leading-body);
+      -webkit-font-smoothing: antialiased;
+      transition: background-color var(--transition), color var(--transition);
+    }
+    h1, h2, h3, h4 {
+      font-weight: 700;
+      letter-spacing: var(--tracking-tight);
+      line-height: var(--leading-tight);
+      margin: 0;
+    }
+    p { margin: 0; }
+    code, pre, kbd { font-family: var(--font-mono); font-size: var(--fs-deck-mono); }
+    a {
+      color: var(--accent);
+      text-decoration: none;
+      transition: color var(--transition);
+    }
+    a:hover { color: var(--accent-hover); }
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+    /* The stage receives programmatic focus (a keyboard sink when overlays
+       close); it isn't an interactive control, so no ring on it. */
+    .stage:focus-visible { outline: none; }
+
+    /* ------------------------------------------------------------------
+       Deck header — theme toggle + personal branding badges. Fixed chrome,
+       unscaled, hidden in print.
+       ------------------------------------------------------------------ */
+    .deck-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+      padding: var(--space-2) var(--space-5);
+      background: color-mix(in srgb, var(--bg) 88%, transparent);
+      backdrop-filter: saturate(180%) blur(8px);
+      border-bottom: 1px solid var(--border);
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: var(--tracking-tight);
+      color: var(--text);
+    }
+    .brand-mark {
+      display: inline-grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: var(--accent);
+      color: #fff;
+    }
+    .header-links {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .icon-button {
+      display: inline-grid;
+      place-items: center;
+      width: 36px;
+      height: 36px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      cursor: pointer;
+      transition: background-color var(--transition), border-color var(--transition);
+    }
+    .icon-button:hover { background: var(--surface); border-color: var(--border-strong); }
+    .icon-button svg { width: 18px; height: 18px; }
+    a.icon-button { color: var(--text-muted); }
+    a.icon-button:hover { color: var(--text); }
+    [data-theme="light"] #icon-moon { display: block; }
+    [data-theme="light"] #icon-sun { display: none; }
+    [data-theme="dark"]  #icon-moon { display: none; }
+    [data-theme="dark"]  #icon-sun  { display: block; }
+
+    /* ------------------------------------------------------------------
+       Stage — a fixed 1280x720 canvas centered in the viewport and scaled
+       as one unit, so the deck letterboxes on mismatched windows. The
+       engine sets --deck-scale and --notes-shift from JS on resize.
+       ------------------------------------------------------------------ */
+    .stage {
+      position: fixed;
+      left: 50%;
+      top: calc(50% - var(--notes-shift, 0px));
+      width: var(--deck-w);
+      height: var(--deck-h);
+      transform: translate(-50%, -50%) scale(var(--deck-scale, 1));
+    }
+
+    /* ------------------------------------------------------------------
+       Slides — absolutely stacked; only .is-current is visible. The fade
+       stays at 200ms and dies entirely under prefers-reduced-motion.
+       No entrance animations.
+       ------------------------------------------------------------------ */
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      padding: var(--space-8);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity var(--transition-slide), visibility 0s 200ms;
+    }
+    .slide.is-current {
+      opacity: 1;
+      visibility: visible;
+      transition: opacity var(--transition-slide);
+    }
+
+    .slide-kicker {
+      font-family: var(--font-mono);
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: var(--space-3);
+    }
+    .slide-title { font-size: var(--fs-deck-h2); margin-bottom: var(--space-6); }
+    .slide-body {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-5);
+    }
+
+    /* Bullets — the workhorse. Content rules cap these at 6 per slide.
+       ol.bullets keeps source numbering (use start="N" on continuations). */
+    ul.bullets, ol.bullets {
+      margin: 0;
+      padding-left: var(--space-6);
+    }
+    ul.bullets li, ol.bullets li { padding-left: var(--space-2); }
+    ul.bullets li + li, ol.bullets li + li { margin-top: var(--space-4); }
+    ul.bullets li::marker { color: var(--accent); }
+    ol.bullets li::marker {
+      color: var(--accent);
+      font-family: var(--font-mono);
+      font-size: 20px;
+    }
+    ul.bullets ul {
+      margin-top: var(--space-3);
+      padding-left: var(--space-5);
+      font-size: var(--fs-deck-small);
+      color: var(--text-muted);
+    }
+    ul.bullets ul li + li { margin-top: var(--space-2); }
+    ul.bullets ul li::marker { color: var(--text-muted); }
+    .slide-body strong { font-weight: 700; }
+    .slide-body code {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0 var(--space-1);
+      font-size: 20px;
+    }
+    /* Inside <pre> the inline-code pill must not apply — the block carries
+       the chrome, the lines stay bare. */
+    .slide-body pre code {
+      background: transparent;
+      border: 0;
+      padding: 0;
+      font-size: inherit;
+    }
+
+    /* Title + closing slides */
+    .slide-title-page, .slide-closing {
+      justify-content: center;
+      align-items: flex-start;
+      gap: var(--space-6);
+    }
+    .slide-title-page h1 { font-size: var(--fs-deck-h1); max-width: 20ch; }
+    .slide-closing h2 { font-size: var(--fs-deck-h1); }
+    .deck-lede {
+      font-size: 28px;
+      line-height: 1.4;
+      color: var(--text-muted);
+      max-width: 44ch;
+    }
+    .deck-meta {
+      font-family: var(--font-mono);
+      font-size: 16px;
+      color: var(--text-muted);
+    }
+
+    /* Personal branding row — same pattern as the style guide template. */
+    .branding {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      margin: 0;
+      list-style: none;
+      padding: 0;
+    }
+    .branding a {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-3);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-muted);
+      font-size: 16px;
+      transition: color var(--transition), border-color var(--transition);
+    }
+    .branding a:hover { color: var(--text); border-color: var(--border-strong); }
+    .branding svg { width: 16px; height: 16px; }
+
+    /* Agenda */
+    ol.agenda {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-4);
+    }
+    ol.agenda.agenda-2col { grid-template-columns: 1fr 1fr; column-gap: var(--space-7); }
+    ol.agenda li {
+      display: flex;
+      align-items: baseline;
+      gap: var(--space-4);
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: var(--tracking-tight);
+    }
+    ol.agenda .agenda-num {
+      font-family: var(--font-mono);
+      font-size: 18px;
+      font-weight: 400;
+      color: var(--accent);
+    }
+
+    /* ------------------------------------------------------------------
+       Deck controls — prev/next, counter, key hints. Fixed chrome,
+       unscaled, hidden in print. Sits above the notes panel when open.
+       ------------------------------------------------------------------ */
+    .deck-controls {
+      position: fixed;
+      right: var(--space-5);
+      bottom: calc(var(--space-5) + var(--notes-h, 0px));
+      z-index: 15;
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2);
+      background: color-mix(in srgb, var(--bg) 85%, transparent);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      transition: bottom var(--transition);
+    }
+    .deck-controls .icon-button:disabled {
+      opacity: 0.35;
+      cursor: default;
+      background: transparent;
+      border-color: var(--border);
+    }
+    #slide-counter {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      color: var(--text-muted);
+      padding-inline: var(--space-2);
+      min-width: 64px;
+      text-align: center;
+    }
+    .key-hint {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-muted);
+      padding-inline: var(--space-2);
+      border-left: 1px solid var(--border);
+    }
+    @media (max-width: 719px) { .key-hint { display: none; } }
+
+    /* ------------------------------------------------------------------
+       Overview grid — toggled with O or Escape. A keyboard-accessible
+       card per slide; Enter jumps, Escape closes.
+       ------------------------------------------------------------------ */
+    .overview {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      background: var(--bg);
+      overflow-y: auto;
+      padding: var(--space-8) var(--space-6) var(--space-6);
+    }
+    .overview-head {
+      max-width: 1280px;
+      margin: 0 auto var(--space-5);
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: var(--space-4);
+    }
+    .overview-head h2 { font-size: 24px; }
+    .overview-head p { font-family: var(--font-mono); font-size: 13px; color: var(--text-muted); }
+    .overview-grid {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: var(--space-4);
+    }
+    .ov-card {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
+      min-height: 96px;
+      padding: var(--space-4);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-family: inherit;
+      text-align: left;
+      cursor: pointer;
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+    .ov-card:hover { border-color: var(--border-strong); box-shadow: var(--shadow-sm); }
+    .ov-card[aria-current="true"] { border-color: var(--accent); }
+    .ov-card[aria-current="true"] .ov-num { color: var(--accent); }
+    .ov-num { font-family: var(--font-mono); font-size: 13px; color: var(--text-muted); }
+    .ov-title { font-size: 15px; font-weight: 700; line-height: 1.35; letter-spacing: var(--tracking-tight); }
+    body:not(.overview-open) .overview { display: none; }
+    body.overview-open .stage { visibility: hidden; }
+
+    /* ------------------------------------------------------------------
+       Speaker notes — <aside class="notes"> inside each slide, hidden in
+       the deck, mirrored into a readable unscaled bottom panel on N.
+       ------------------------------------------------------------------ */
+    .slide .notes { display: none; }
+    body.notes-open { --notes-h: 24vh; }
+    .notes-panel {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 24vh;
+      z-index: 12;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: var(--space-4) var(--space-6);
+      overflow-y: auto;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    body:not(.notes-open) .notes-panel { display: none; }
+    .notes-panel .notes-label {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: var(--space-2);
+    }
+    .notes-panel p { margin: 0; }
+    .notes-panel p + p { margin-top: var(--space-2); }
+    .notes-panel ul { margin: 0; padding-left: var(--space-5); }
+    .notes-panel .notes-empty { color: var(--text-muted); }
+
+    /* Table slide */
+    .table-wrap {
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      align-self: stretch;
+    }
+    table.compare {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 20px;
+    }
+    table.compare th,
+    table.compare td {
+      text-align: left;
+      padding: var(--space-3) var(--space-4);
+      vertical-align: top;
+      border-bottom: 1px solid var(--border);
+    }
+    table.compare thead th {
+      font-size: 15px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      background: var(--bg);
+    }
+    table.compare tbody tr:last-child th,
+    table.compare tbody tr:last-child td { border-bottom: 0; }
+    table.compare th[scope="row"] {
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+    }
+    table.compare td { color: var(--text-muted); }
+    table.compare.tight th,
+    table.compare.tight td { padding: var(--space-2) var(--space-4); }
+    table.compare .w-term { width: 200px; }
+    table.compare .w-name { width: 360px; }
+    .table-note {
+      font-size: var(--fs-deck-small);
+      color: var(--text-muted);
+    }
+    .jur-code {
+      font-family: var(--font-mono);
+      font-size: 15px;
+      font-weight: 400;
+      color: var(--text-muted);
+      margin-left: var(--space-2);
+    }
+
+    /* Dense bullets — the 6-domain jurisdiction slides */
+    ul.bullets.dense li + li { margin-top: var(--space-3); }
+
+    /* Severity state colours — genuine state only (matrix cells, method legend) */
+    .sev-strict, .sev-moderate, .sev-light, .sev-none { font-weight: 700; }
+    .sev-strict   { color: var(--sev-strict); }
+    .sev-moderate { color: var(--sev-moderate); }
+    .sev-light    { color: var(--sev-light); }
+    .sev-none     { color: var(--sev-none); }
+
+    /* Title-slide disclaimer note */
+    .deck-note {
+      font-size: var(--fs-deck-small);
+      color: var(--text-muted);
+      max-width: 56ch;
+    }
+
+    /* ------------------------------------------------------------------
+       Print — one slide per page, chrome removed, light palette forced.
+       With notes mode on (press N before printing), notes append below
+       each slide and pages may flow onto a second sheet.
+       ------------------------------------------------------------------ */
+    @page { size: 13.333in 7.5in; margin: 0; }
+    @media print {
+      /* Force the light palette so a dark-toggled deck doesn't print ink-heavy. */
+      :root, [data-theme="dark"] {
+        --bg: #FFFFFF;
+        --surface: #FFFFFF;
+        --text: #0A0A0A;
+        --text-muted: #6B7280;
+        --border: #E5E7EB;
+        --border-strong: #D1D5DB;
+      }
+      body { overflow: visible; }
+      .deck-header, .deck-controls, .overview, .notes-panel { display: none !important; }
+      .stage {
+        position: static;
+        width: auto;
+        height: auto;
+        transform: none;
+      }
+      .slide {
+        position: relative;
+        inset: auto;
+        width: var(--deck-w);
+        height: var(--deck-h);
+        margin: 0 auto;
+        opacity: 1 !important;
+        visibility: visible !important;
+        page-break-after: always;
+        break-after: page;
+        overflow: hidden;
+      }
+      .slide:last-child { page-break-after: auto; break-after: auto; }
+      body.notes-open .slide { height: auto; min-height: var(--deck-h); overflow: visible; }
+      body.notes-open .slide .notes {
+        display: block;
+        margin-top: var(--space-5);
+        padding-top: var(--space-4);
+        border-top: 1px solid var(--border);
+        color: var(--text-muted);
+        font-size: var(--fs-deck-small);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        transition: none !important;
+        animation: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="deck-header">
+    <span class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <!-- Lucide: square -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
+      </span>
+      <span class="deck-name">APAC FinTech Architecture</span>
+    </span>
+    <div class="header-links">
+      <a class="icon-button" href="https://github.com/jamesbuckett" rel="noopener noreferrer" target="_blank" aria-label="GitHub" title="GitHub">
+        <!-- Lucide: github -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+      </a>
+      <a class="icon-button" href="https://twitter.com/jamesbuckett" rel="noopener noreferrer" target="_blank" aria-label="Twitter / X" title="Twitter / X">
+        <!-- Lucide: twitter (x glyph) -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4l11.733 16h4.267l-11.733 -16z"/><path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772"/></svg>
+      </a>
+      <a class="icon-button" href="https://www.linkedin.com/in/jamesbuckett" rel="noopener noreferrer" target="_blank" aria-label="LinkedIn" title="LinkedIn">
+        <!-- Lucide: linkedin -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+      </a>
+      <button id="theme-toggle" class="icon-button" type="button" aria-label="Toggle theme" title="Toggle theme">
+        <!-- Lucide: moon -->
+        <svg id="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <!-- Lucide: sun -->
+        <svg id="icon-sun"  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="stage" id="stage" tabindex="-1" aria-label="Presentation slides">
+    <!-- SLIDES:BEGIN -->
+
+    <section class="slide slide-title-page" id="slide-1" data-title="Title">
+      <h1>APAC FinTech Architecture — 10 Jurisdictions, 12 Constraints Each</h1>
+      <p class="deck-lede">Architect-grade reference on data residency, workload isolation, and cyber rules across 10 APAC jurisdictions — with binding citations.</p>
+      <p class="deck-meta">James Buckett &middot; July 2026</p>
+      <p class="deck-note">Reference only. This brief distils binding instruments into architectural implications. Regulation evolves quickly — verify any rule with qualified counsel before design commitment.</p>
+      <ul class="branding" aria-label="Personal links">
+        <li><a href="https://github.com/jamesbuckett" rel="noopener noreferrer" target="_blank">
+          <!-- Lucide: github -->
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+          GitHub
+        </a></li>
+        <li><a href="https://twitter.com/jamesbuckett" rel="noopener noreferrer" target="_blank">
+          <!-- Lucide: twitter (x glyph) -->
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4l11.733 16h4.267l-11.733 -16z"/><path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772"/></svg>
+          Twitter / X
+        </a></li>
+        <li><a href="https://www.linkedin.com/in/jamesbuckett" rel="noopener noreferrer" target="_blank">
+          <!-- Lucide: linkedin -->
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+          LinkedIn
+        </a></li>
+      </ul>
+      <aside class="notes">
+        <p>A working reference for architects who must turn regulator circulars into deployment decisions. For each of 10 APAC jurisdictions: data residency, workload isolation, cross-border transfer rules, and the binding instrument behind each — plus five architectural implications you can apply this week.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-2" data-title="Agenda">
+      <p class="slide-kicker">Agenda</p>
+      <h2 class="slide-title">What this deck covers</h2>
+      <div class="slide-body">
+        <ol class="agenda agenda-2col">
+          <li><span class="agenda-num">01</span> Method &amp; Framing</li>
+          <li><span class="agenda-num">02</span> At a Glance — Heat Map</li>
+          <li><span class="agenda-num">03</span> Indonesia</li>
+          <li><span class="agenda-num">04</span> India</li>
+          <li><span class="agenda-num">05</span> Taiwan</li>
+          <li><span class="agenda-num">06</span> Japan</li>
+          <li><span class="agenda-num">07</span> China (Mainland)</li>
+          <li><span class="agenda-num">08</span> Hong Kong SAR</li>
+          <li><span class="agenda-num">09</span> Singapore</li>
+          <li><span class="agenda-num">10</span> Malaysia</li>
+          <li><span class="agenda-num">11</span> Australia</li>
+          <li><span class="agenda-num">12</span> Thailand</li>
+          <li><span class="agenda-num">13</span> Comparative Matrix</li>
+          <li><span class="agenda-num">14</span> Comparison Lab</li>
+          <li><span class="agenda-num">15</span> Architecture Decision Flow</li>
+          <li><span class="agenda-num">16</span> Glossary</li>
+        </ol>
+      </div>
+      <aside class="notes">
+        <p>Sixteen sections in source order. Each of the ten jurisdictions follows the same 12-domain structure and closes with five architectural implications; the comparative matrix and glossary close the deck.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-3" data-title="Method &amp; Framing">
+      <p class="slide-kicker">Method &amp; Framing</p>
+      <h2 class="slide-title">Twelve dimensions, four severity grades</h2>
+      <div class="slide-body">
+        <ul class="bullets dense">
+          <li>Twelve dimensions per jurisdiction — regulator identity through residency, isolation, cryptography, binding legislation.</li>
+          <li>Citations name the circular or master direction that constrains architecture — not the headline statute.</li>
+          <li><strong class="sev-strict">Strict</strong> — hard localization or onshore-only processing mandated by statute or binding circular.</li>
+          <li><strong class="sev-moderate">Moderate</strong> — approval, mirroring, or supervisory-access conditions; cross-border permitted.</li>
+          <li><strong class="sev-light">Light</strong> — principles-based expectations; notification or best-effort onshore preference.</li>
+          <li><strong class="sev-none">None</strong> — no explicit mandate; industry practice and commercial considerations apply.</li>
+        </ul>
+      </div>
+      <aside class="notes">
+        <p>The brief distinguishes binding rules (statute / circular) from supervisory expectation (letters, guidance, examination practice) and industry practice (de facto standards). Areas of active regulatory flux are marked Flux.</p>
+        <p>Each country section closes with an Architectural Implications callout — five design constraints a practitioner would apply today. The document ends with a comparative matrix across the four localization / isolation dimensions that most materially determine deployment topology.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-4" data-title="At a Glance — Heat Map">
+      <p class="slide-kicker">At a Glance — Localization &amp; Isolation Heat Map</p>
+      <h2 class="slide-title">Regional takeaways — 30-second read</h2>
+      <div class="slide-body">
+        <ul class="bullets">
+          <li><strong>Strictest tier</strong> — China is strict on all four dimensions; India is strict on data and process.</li>
+          <li><strong>Lightest tier</strong> — Australia, Singapore and Japan are permissive on data and entity rules, but all three hold a moderate workload-isolation floor.</li>
+          <li><strong>Hidden trap</strong> — Hong Kong and Thailand rate Light on data but Moderate on workload isolation; easy to under-scope segregation.</li>
+          <li><strong>Most active flux (2024–2026)</strong> — India DPDP rules, Indonesia PDP phase-in, Australia CPS 230 in force, Hong Kong CFI 2.0 rollout.</li>
+        </ul>
+      </div>
+      <aside class="notes">
+        <p>India's nuance: strict on data and process but moderate on entity and workload isolation.</p>
+        <p>The source page carries an interactive colour-coded heat map of binding severity across the four topology-shaping dimensions — columns can be toggled, and hovering any cell shows the governing instrument. The severity data itself appears later in this deck as the comparative matrix.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-5" data-title="Indonesia (1/3)">
+      <p class="slide-kicker">Jurisdiction 1 of 10 &middot; Domains 01–06</p>
+      <h2 class="slide-title">Indonesia (1/3)</h2>
+      <div class="slide-body">
+        <ul class="bullets dense">
+          <li><strong>01 Regulatory Bodies</strong> — OJK (prudential &amp; conduct), BI (payments), Kominfo (data), BSSN (cyber).</li>
+          <li><strong>02 Data Localization</strong> — BI 19/14/PBI/2017: payment data onshore; POJK 11/2022 allows offshore with approval.</li>
+          <li><strong>03 System &amp; Process Localization</strong> — GPN switching, clearing &amp; settlement onshore; onshore DR preferred.</li>
+          <li><strong>04 Legal Entity Segregation</strong> — local PT subsidiary or KCBA branch; fintechs must be Indonesian entities.</li>
+          <li><strong>05 Workload Isolation</strong> — public cloud permitted; payment switching and keys dedicated, with onshore HSM.</li>
+          <li><strong>06 Cross-Border Data Flow</strong> — PDP Law 27/2022: adequacy, safeguards or consent; BI restricts payment data.</li>
+        </ul>
+      </div>
+      <aside class="notes">
+        <p><strong>02</strong> — GR 71/2019 relaxed the general mandate, splitting public-scope (government) from private-scope ESOs; financial services keep tighter sectoral rules. Bank customer / transaction data may be mirrored offshore with an onshore primary copy and regulator access.</p>
+        <p><strong>03</strong> — Core payment authorization and fraud screening on domestic rails execute onshore; regional DR permitted for non-payment workloads with OJK consent; cross-border admin / DevOps allowed under OJK-approved access controls.</p>
+        <p><strong>04</strong> — Intra-group outsourcing permitted under POJK 9/POJK.03/2016 with documented oversight and local board accountability; local director accountability for IT risk is supervisory practice.</p>
+        <p><strong>05</strong> — Logical tenancy isolation acceptable for customer PII when supported by controls; production / non-production segregation explicit in OJK TRM. <strong>06</strong> — insurance and capital-markets carve-outs largely align with banking TRM.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-6" data-title="Indonesia (2/3)">
+      <p class="slide-kicker">Jurisdiction 1 of 10 &middot; Domains 07–12</p>
+      <h2 class="slide-title">Indonesia (2/3)</h2>
+      <div class="slide-body">
+        <ul class="bullets dense">
+          <li><strong>07 Cybersecurity Standards</strong> — POJK 11/2022 (ISO 27001 / NIST-aligned); OJK incidents ~24 h, BI disruptions 1 h.</li>
+          <li><strong>08 API &amp; Open Banking</strong> — SNAP standard mandatory for payment providers; OAuth 2.0, mTLS, signed payloads.</li>
+          <li><strong>09 Cloud &amp; Infrastructure</strong> — material outsourcing needs OJK notification and exit plans; payment CSPs onshore.</li>
+          <li><strong>10 Licensing &amp; Compliance Tech</strong> — AML per Law 8/2010 (PPATK); e-KYC via Dukcapil biometrics; IKD digital ID.</li>
+          <li><strong>11 Encryption &amp; Authentication</strong> — TLS 1.2+; customer MFA mandatory; onshore HSM for payment-switching keys.</li>
+          <li><strong>12 Key Legislation</strong> — UU ITE, GR 71/2019, PDP Law 27/2022, POJK 11/2022, BI PBI payment rules.</li>
+        </ul>
+      </div>
+      <aside class="notes">
+        <p><strong>07</strong> — Annual penetration testing, quarterly vulnerability scans; red-teaming is a supervisory expectation for systemically important banks.</p>
+        <p><strong>08</strong> — SNAP (Standar Nasional Open API Pembayaran, BI 2021) has phased onboarding; data-sharing beyond payments stays voluntary / industry-led. <strong>09</strong> — concentration risk addressed via demonstrable alternative-provider plans.</p>
+        <p><strong>10</strong> — e-KYC under POJK 12/POJK.03/2018 (digital banking) with biometric liveness. <strong>11</strong> — BI payment rails prescribe cipher suites and key-rotation intervals; no mandated national algorithm, SNI / international standards accepted.</p>
+        <p><strong>12</strong> — UU ITE is Law 11/2008 as amended by Law 19/2016 and Law 1/2024; PBI 23/6/PBI/2021 covers payment service providers.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-7" data-title="Indonesia (3/3)">
+      <p class="slide-kicker">Jurisdiction 1 of 10 &middot; Architectural Implications</p>
+      <h2 class="slide-title">Indonesia (3/3)</h2>
+      <div class="slide-body">
+        <ul class="bullets">
+          <li>Payment workloads onshore — dedicated VPC, onshore HSM, primary and DR inside Indonesia.</li>
+          <li>Non-payment workloads may process cross-border with OJK notification — design a clean data-classification boundary.</li>
+          <li>SNAP-compliant API gateway with mTLS and signed JWS payloads; key material stays onshore.</li>
+          <li>GPN / QRIS routing gateway inside Indonesia — foreign switching not permitted for domestic transactions.</li>
+          <li>Incident pipelines — 24-hour OJK notification and 1-hour BI disruption channel — must survive a CSP outage.</li>
+        </ul>
+      </div>
+      <aside class="notes">
+        <p>The classification boundary exists so only non-sensitive, non-payment data (CRM, analytics, collaboration) exits the country. Both regulator-notification channels are architectural dependencies in their own right: they must keep working while the cloud provider is down.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-8" data-title="India (1/3)">
+      <p class="slide-kicker">Jurisdiction 2 of 10 &middot; Domains 01–06</p>
+      <h2 class="slide-title">India (1/3)</h2>
+      <div class="slide-body">
+        <ul class="bullets dense">
+          <li><strong>01 Regulatory Bodies</strong> — RBI (banks, payments), SEBI, IRDAI, CERT-In (cyber), NPCI (UPI rails).</li>
+          <li><strong>02 Data Localization</strong> — RBI circular (6 Apr 2018): payment-system data stored only in India.</li>
+          <li><strong>03 System &amp; Process Localization</strong> — domestic authorization, clearing, settlement in India; NPCI on-soil hosting.</li>
+          <li><strong>04 Legal Entity Segregation</strong> — Indian-incorporated payment aggregators; local CIO / CISO and board IT committee.</li>
+          <li><strong>05 Workload Isolation</strong> — IT Governance Direction 2023: segregation; dedicated core-banking and HSM environments.</li>
+          <li><strong>06 Cross-Border Data Flow</strong> — DPDP 2023 negative-list model (rules pending); payment localization overrides.</li>
+        </ul>
+      </div>
+      <aside class="notes">
+        <p><strong>02</strong> — RBI Circular DPSS.CO.OD.No. 2785/06.08.005/2017-18 applies to all payment-system operators including foreign schemes; KYC documents keep an onshore primary with offshore mirroring permitted under access and deletion guarantees.</p>
+        <p><strong>03</strong> — NPCI requires direct connectivity into its Mumbai / Hyderabad / Chennai data centres; DR must be in India in a different seismic zone; overseas admin access must be governed, logged and CERT-In compliant.</p>
+        <p><strong>04</strong> — Foreign banks operate as branches or wholly-owned subsidiaries; PA-PG Master Direction (2020, updated 2024). Group platforms allowed under the outsourcing direction with effective local control.</p>
+        <p><strong>05</strong> — Zero-trust not explicit but strongly aligned with the Digital Payment Security Controls direction. <strong>06</strong> — SEBI Cloud Framework (2023) and IRDAI outsourcing rules add accessibility and audit rights.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-9" data-title="India (2/3)">
+      <p class="slide-kicker">Jurisdiction 2 of 10 &middot; Domains 07–12</p>
+      <h2 class="slide-title">India (2/3)</h2>
+      <div class="slide-body">
+        <ul class="bullets dense">
+          <li><strong>07 Cybersecurity Standards</strong> — CERT-In: 6-hour incident reporting, 180-day onshore logs; SEBI CSCRF (2024).</li>
+          <li><strong>08 API &amp; Open Banking</strong> — Account Aggregator consent framework; UPI; OAuth 2.0, signed JWS, mTLS to NPCI.</li>
+          <li><strong>09 Cloud &amp; Infrastructure</strong> — RBI draft cloud framework (2024); SEBI framework sets CSP selection and audit.</li>
+          <li><strong>10 Licensing &amp; Compliance Tech</strong> — PMLA / FIU-IND reporting; Aadhaar e-KYC and video KYC; CKYCR registry.</li>
+          <li><strong>11 Encryption &amp; Authentication</strong> — TLS 1.2+; 2FA for card-not-present; CCA-approved signatures; FIPS L3 HSMs.</li>
+          <li><strong>12 Key Legislation</strong> — IT Act 2000, DPDP Act 2023, RBI Payment Security &amp; IT Governance Directions.</li>
+        </ul>
+      </div>
+      <aside class="notes">
+        <p><strong>07</strong> — RBI Cyber Security Framework in Banks (2016) plus Master Direction on Digital Payment Security Controls (2021); CERT-In Directions (28 Apr 2022) also mandate NTP sync to NPL/NIC; annual red-teaming for SCB/PSB, VAPT twice-yearly, ISO 27001 and PCI-DSS widespread.</p>
+        <p><strong>08</strong> — The AA model is an RBI-regulated NBFC-AA consent architecture (ReBIT specs); UPI is ISO 20022-aligned with 2.0 / AutoPay extensions; ONDC (Beckn protocol) influences payment orchestration; FAPI-like profiles being adopted.</p>
+        <p><strong>09</strong> — MeitY empanelment historically for government workloads; banks pick STQC / empanelled providers for sensitive workloads. <strong>11</strong> — keys held onshore for payment-system functions. <strong>12</strong> — includes SPDI Rules 2011 and CERT-In Directions 2022; DPDP rules notified Jan 2025.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-10" data-title="India (3/3)">
+      <p class="slide-kicker">Jurisdiction 2 of 10 &middot; Architectural Implications</p>
+      <h2 class="slide-title">India (3/3)</h2>
+      <div class="slide-body">
+        <ul class="bullets">
+          <li>All payment data — at rest, in processing, in backup — resides in India: CBS, switch and HSM with in-country DR.</li>
+          <li>Strict classification and tokenisation so overseas analytics see only non-payment, de-identified records.</li>
+          <li>CERT-In-aligned logging: 180-day onshore retention, NPL/NIC time sync, a 6-hour incident workflow.</li>
+          <li>Account Aggregator consent flows and RBI-compliant video-KYC; CKYCR as the canonical KYC store.</li>
+          <li>Treat cross-border movement as policy-controlled egress — expect a restricted subset under DPDP rules.</li>
+        </ul>
+      </div>
+      <aside class="notes">
+        <p>The DPDP negative list was still draft as of Jan 2025 — architect on the assumption that some categories of personal data will be barred from leaving India, so egress must be a controllable policy point rather than an ambient capability.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-11" data-title="Taiwan (1/3)">
+      <p class="slide-kicker">Jurisdiction 3 of 10 &middot; Domains 01–06</p>
+      <h2 class="slide-title">Taiwan (1/3)</h2>
+      <div class="slide-body">
+        <ul class="bullets dense">
+          <li><strong>01 Regulatory Bodies</strong> — FSC (integrated), CBC (central bank), NCC / MODA (ICT), PIPC (privacy, phasing in).</li>
+          <li><strong>02 Data Localization</strong> — no general statute; core banking data onshore by supervisory expectation.</li>
+          <li><strong>03 System &amp; Process Localization</strong> — core platform and ledger onshore with onshore DR; FISC rails on-soil.</li>
+          <li><strong>04 Legal Entity Segregation</strong> — branch or subsidiary; subsidiaries required for securities and insurance.</li>
+          <li><strong>05 Workload Isolation</strong> — public cloud for non-core; core banking, AML, card issuance dedicated or isolated.</li>
+          <li><strong>06 Cross-Border Data Flow</strong> — PDPA Art. 21 lets FSC restrict transfers; cross-strait under national-security review.</li>
+        </ul>
+      </div>
+      <aside class="notes">
+        <p><strong>02</strong> — FSC can restrict specific datasets by sectoral notification under PDPA Art. 21; credit information (JCIC) and NCC Taiwan rails are strictly onshore.</p>
+        <p><strong>03</strong> — Domestic clearing runs through Financial Information Service Co. (FISC) and the TWD large-value RTGS (CBC); offshore processing of non-core functions needs FSC outsourcing pre-approval.</p>
+        <p><strong>04</strong> — Group-platform sharing allowed with pre-approved outsourcing; local board-level IT governance required. <strong>05</strong> — production / non-production segregation and privileged access audited in annual FSC examinations; the CSP market pairs domestic operators (Chunghwa Telecom) with hyperscale regions.</p>
+        <p><strong>06</strong> — otherwise individual consent plus purpose limitation.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-12" data-title="Taiwan (2/3)">
+      <p class="slide-kicker">Jurisdiction 3 of 10 &middot; Domains 07–12</p>
+      <h2 class="slide-title">Taiwan (2/3)</h2>
+      <div class="slide-body">
+        <ul class="bullets dense">
+          <li><strong>07 Cybersecurity Standards</strong> — FSC e-banking security regulations; Action Plan 4.0 red-teaming; ~2 h reporting.</li>
+          <li><strong>08 API &amp; Open Banking</strong> — voluntary three-phase framework via FISC; FAPI-aligned, mTLS, OAuth 2.0.</li>
+          <li><strong>09 Cloud &amp; Infrastructure</strong> — FSC pre-approval for material cloud; on-site audit rights; documented exit.</li>
+          <li><strong>10 Licensing &amp; Compliance Tech</strong> — AML under Money Laundering Control Act; eKYC via TWID / JCIC; FIDO liveness.</li>
+          <li><strong>11 Encryption &amp; Authentication</strong> — TLS 1.2+, MFA mandatory; GCA / TWCA national PKI; FIPS L3 HSMs onshore.</li>
+          <li><strong>12 Key Legislation</strong> — Banking Act Art. 45-1, PDPA, Cyber Security Management Act 2018, FSC outsourcing rules.</li>
+        </ul>
+      </div>
+      <aside class="notes">
+        <p><strong>07</strong> — The FSC Regulations Governing Standards for Information System &amp; Security Management of Electronic Banking prescribe controls, logging and incident reporting; ISO 27001 and PCI-DSS widely adopted; ~2 hours applies to material service disruption.</p>
+        <p><strong>08</strong> — Phases: (1) public information, (2) customer information with consent, (3) transaction information. <strong>09</strong> — outsourcing regulations amended Jul 2019 with 2022 clarifications; SOC 2 / ISAE 3402 reports plus local attestations acceptable in lieu of on-site audit.</p>
+        <p><strong>10</strong> — MJIB acts as FIU; eKYC also runs through the National Credit Card Center. <strong>11</strong> — RSA-2048 / ECDSA-P256 for signatures; Electronic Signatures Act amended 2024. <strong>12</strong> — PDPA dates from 1995, amended 2023.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-13" data-title="Taiwan (3/3)">
+      <p class="slide-kicker">Jurisdiction 3 of 10 &middot; Architectural Implications</p>
+      <h2 class="slide-title">Taiwan (3/3)</h2>
+      <div class="slide-body">
+        <ul class="bullets">
+          <li>Core banking, ledger and customer master onshore with Taiwan DR; auditable FSC access for CSP-hosted components.</li>
+          <li>FSC pre-approval for material cloud outsourcing — deliver reversibility and exit design at approval, not after.</li>
+          <li>Integrate FISC rails and JCIC over onshore private connectivity; no cross-region routing of domestic settlements.</li>
+          <li>FAPI-grade open-banking façade, aligned to the FISC phase applicable to the institution's licence.</li>
+          <li>Design consent capture, purpose-limitation tagging and cross-border hooks now — PIPC is still maturing.</li>
+        </ul>
+      </div>
+      <aside class="notes">
+        <p>PIPC was established in 2024 with phased operationalization — the retrofit cost of consent and purpose-limitation plumbing is the reason to build the hooks before the regulator finishes standing up.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-14" data-title="Japan (1/3)">
+      <p class="slide-kicker">Jurisdiction 4 of 10 &middot; Domains 01–06</p>
+      <h2 class="slide-title">Japan (1/3)</h2>
+      <div class="slide-body">
+        <ul class="bullets dense">
+          <li><strong>01 Regulatory Bodies</strong> — FSA (regulator), BOJ (BOJ-NET), PPC (APPI), FISC (de facto security guidelines).</li>
+          <li><strong>02 Data Localization</strong> — no statutory mandate; FSA access on request; audit rights for offshore data.</li>
+          <li><strong>03 System &amp; Process Localization</strong> — BOJ-NET and Zengin on-soil; core ledger and AML onshore by convention.</li>
+          <li><strong>04 Legal Entity Segregation</strong> — branches common; named local CIO / CISO accountability; FSA ring-fencing.</li>
+          <li><strong>05 Workload Isolation</strong> — public cloud broadly permitted; FISC guidelines drive isolation and key separation.</li>
+          <li><strong>06 Cross-Border Data Flow</strong> — APPI: consent, adequacy or safeguards; EU–Japan mutual adequacy in place.</li>
+        </ul>
+      </div>
+      <aside class="notes">
+        <p><strong>02</strong> — Resolution-planning and records-retention obligations often drive de facto onshore copies. <strong>03</strong> — BOJ-NET and Zengin (RTGS / ACH) must be operated by Japanese-licensed operators; DR is typically a second domestic region in a different seismic zone (FISC guidance).</p>
+        <p><strong>04</strong> — Subsidiaries required for certain securities / insurance business; ring-fencing is implicit through the FSA Comprehensive Supervisory Guidelines. <strong>05</strong> — privileged-access management, segregation of duties and production / non-production separation explicitly prescribed; zero-trust gaining traction via FSA cyber strategy.</p>
+        <p><strong>06</strong> — APPI amended 2022; FSA may attach extra supervisory conditions in outsourcing approvals.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-15" data-title="Japan (2/3)">
+      <p class="slide-kicker">Jurisdiction 4 of 10 &middot; Domains 07–12</p>
+      <h2 class="slide-title">Japan (2/3)</h2>
+      <div class="slide-body">
+        <ul class="bullets dense">
+          <li><strong>07 Cybersecurity Standards</strong> — FISC Guidelines at examination; FSA threat-led testing; &lt;24 h reporting.</li>
+          <li><strong>08 API &amp; Open Banking</strong> — Banking Act 2017 open-API: contractual EPSP model, no central mandate.</li>
+          <li><strong>09 Cloud &amp; Infrastructure</strong> — FSA notification for material outsourcing; ISMAP-listed CSPs referenced.</li>
+          <li><strong>10 Licensing &amp; Compliance Tech</strong> — APTCP AML; eKYC via selfie + ID or My Number IC chip; JAFIC as FIU.</li>
+          <li><strong>11 Encryption &amp; Authentication</strong> — TLS 1.2+; CRYPTREC informs algorithms; MFA for high-risk; onshore HSM.</li>
+          <li><strong>12 Key Legislation</strong> — Banking Act, APPI (2022), FIEA, FISC Guidelines 10th edition (2024 revisions).</li>
+        </ul>
+      </div>
+      <aside class="notes">
+        <p><strong>07</strong> — FISC Security Guidelines (10th edition series) are the de facto examination standard; FSA Cybersecurity Policy / Practical Guidelines (updated 2024) set threat-led testing for G-SIBs / D-SIBs; reporting is "without delay", in practice under 24 hours for material events; ISO 27001 / NIST CSF mapping and PCI-DSS are common.</p>
+        <p><strong>08</strong> — Banks publish APIs under contracts with Electronic Payment Service Providers; JBA API standards; FAPI alignment growing — bilateral rather than a centralized CDR-style scheme.</p>
+        <p><strong>09</strong> — Exit / reversibility plans expected; concentration risk highlighted in supervisory communications. <strong>11</strong> — no mandated national algorithm family.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-16" data-title="Japan (3/3)">
+      <p class="slide-kicker">Jurisdiction 4 of 10 &middot; Architectural Implications</p>
+      <h2 class="slide-title">Japan (3/3)</h2>
+      <div class="slide-body">
+        <ul class="bullets">
+          <li>Anchor core banking, BOJ-NET and Zengin connectivity on-soil; DR in a second seismic region.</li>
+          <li>Map CSP controls to the FISC Security Guidelines — the lingua franca of FSA examination.</li>
+          <li>Use EU–Japan adequacy for group analytics on that axis; avoid mixing non-adequate regions.</li>
+          <li>Integrate My Number / JPKI for eKYC; design onboarding with pluggable identity evidence.</li>
+          <li>Publish open-API endpoints at FAPI grade; formalise EPSP partner onboarding as change management.</li>
+        </ul>
+      </div>
+      <aside class="notes">
+        <p>Japan is light on statute but heavy on examination practice — FISC alignment is what the supervisor actually tests against, which is why it functions as the control taxonomy for cloud architecture here.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-17" data-title="China (1/3)">
+      <p class="slide-kicker">Jurisdiction 5 of 10 &middot; Domains 01–06</p>
+      <h2 class="slide-title">China (Mainland) (1/3)</h2>
+      <div class="slide-body">
+        <ul class="bullets dense">
+          <li><strong>01 Regulatory Bodies</strong> — NFRA (prudential), PBOC (payments), CSRC, CAC (cyber &amp; data), SCA (cryptography).</li>
+          <li><strong>02 Data Localization</strong> — CSL: CIIOs store personal and important data onshore; PBOC keeps financial data onshore.</li>
+          <li><strong>03 System &amp; Process Localization</strong> — CNAPS, NUCC, UnionPay, NetsUnion clearing onshore; onshore DR and ops.</li>
+          <li><strong>04 Legal Entity Segregation</strong> — local subsidiary / JV licensing; the system of record must be local.</li>
+          <li><strong>05 Workload Isolation</strong> — MLPS 2.0 grades 1–5; financial core is Level 3+ on dedicated environments.</li>
+          <li><strong>06 Cross-Border Data Flow</strong> — PIPL routes: CAC assessment, standard contract, or certification.</li>
+        </ul>
+      </div>
+      <aside class="notes">
+        <p><strong>01</strong> — NFRA formed 2023, absorbing CBIRC; MPS enforces MLPS. <strong>02</strong> — PIPL and DSL (both 2021) reinforce onshore storage and add cross-border assessment regimes; bank-card transactions stay on UnionPay rails onshore; the CIIP Regulation (2021) formalises CIIO designation.</p>
+        <p><strong>03</strong> — Admin / DevOps access from outside China is generally disallowed for CIIO workloads — onshore operations teams required; "two-location, three-centre" multi-active DR patterns are standard.</p>
+        <p><strong>04</strong> — Securities / fund management usually needs a JV or WFOE with specific licences; local CIO / CISO and IT governance board are supervisory norms. <strong>05</strong> — public cloud only for non-CIIO workloads from licensed domestic CSPs. <strong>06</strong> — March 2024 CAC regulations relaxed thresholds, but they still apply to financial data; "important data" catalogues are in flux.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-18" data-title="China (2/3)">
+      <p class="slide-kicker">Jurisdiction 5 of 10 &middot; Domains 07–12</p>
+      <h2 class="slide-title">China (Mainland) (2/3)</h2>
+      <div class="slide-body">
+        <ul class="bullets dense">
+          <li><strong>07 Cybersecurity Standards</strong> — MLPS 2.0 (GB/T 22239), CIIP Regulation, JR/T 0071; immediate CAC reporting.</li>
+          <li><strong>08 API &amp; Open Banking</strong> — no unified scheme; PBOC JR/T 0185 sets API security; NetsUnion routes super-apps.</li>
+          <li><strong>09 Cloud &amp; Infrastructure</strong> — foreign CSPs only via licensed partners (AWS × Sinnet, Azure × 21Vianet).</li>
+          <li><strong>10 Licensing &amp; Compliance Tech</strong> — AML Law (amended 2024); MPS ID verification for eKYC; e-CNY expected.</li>
+          <li><strong>11 Encryption &amp; Authentication</strong> — SM2 / SM3 / SM4 mandated; SCA-certified HSMs; keys onshore.</li>
+          <li><strong>12 Key Legislation</strong> — CSL 2017, DSL 2021, PIPL 2021, CIIP 2021, Crypto Law 2020, CAC flow rules 2024.</li>
+        </ul>
+      </div>
+      <aside class="notes">
+        <p><strong>07</strong> — Incident reporting to CAC and sector regulators under CSL is immediate / within hours for material events; regular "HW / 护网" attack-defence drills organised by MPS and industry.</p>
+        <p><strong>08</strong> — Alipay and WeChat Pay act as quasi-open-access rails under PBOC supervision. <strong>09</strong> — data sovereignty is absolute for CIIOs; NFRA / PBOC outsourcing rules require notification or approval for material outsourcing; JR/T 0201 drives cloud-native modernisation.</p>
+        <p><strong>10</strong> — PBOC CAMLMAC reporting; facial recognition common in eKYC. <strong>11</strong> — Commercial Cryptography Law (2020) with SM9 also in the family; payment messaging typically signed SM2/SM3; MFA for customer and privileged access. <strong>12</strong> — Counter-Espionage Law amended 2023 also relevant.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-19" data-title="China (3/3)">
+      <p class="slide-kicker">Jurisdiction 5 of 10 &middot; Architectural Implications</p>
+      <h2 class="slide-title">China (Mainland) (3/3)</h2>
+      <div class="slide-body">
+        <ul class="bullets">
+          <li>Fully onshore stack — licensed domestic CSP or JV, SM-family crypto, SCA-certified HSMs, onshore SRE; assume no foreign admin access.</li>
+          <li>Design MLPS Level-3+ controls from day one — graded testing, dedicated SecOps, MPS go-live approval.</li>
+          <li>Treat cross-border data as a compliance project: map "important data", budget CAC assessment lead times, minimise egress.</li>
+          <li>Integrate CNAPS, NUCC, NetsUnion and UnionPay via approved domestic connectivity; roadmap e-CNY for retail.</li>
+          <li>Local entity, local CIO / CISO, local board, local system of record — offshore platforms cannot be the book of record.</li>
+        </ul>
+      </div>
+      <aside class="notes">
+        <p>Egress minimisation in practice means tokenisation and aggregation before anything leaves the mainland estate. The go-live approval from MPS for rated systems is a schedule dependency most global programmes underestimate.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-20" data-title="Hong Kong (1/3)">
+      <p class="slide-kicker">Jurisdiction 6 of 10 &middot; Domains 01–06</p>
+      <h2 class="slide-title">Hong Kong SAR (1/3)</h2>
+      <div class="slide-body">
+        <ul class="bullets dense">
+          <li><strong>01 Regulatory Bodies</strong> — HKMA (banking &amp; payments), SFC (securities &amp; virtual assets), IA, PCPD (privacy).</li>
+          <li><strong>02 Data Localization</strong> — none statutory; records "readily available" in HK; PDPO s.33 not in force.</li>
+          <li><strong>03 System &amp; Process Localization</strong> — CHATS RTGS and FPS onshore; offshore processing under SA-2 non-objection.</li>
+          <li><strong>04 Legal Entity Segregation</strong> — local incorporation or branch; Manager-in-Charge names accountable individuals.</li>
+          <li><strong>05 Workload Isolation</strong> — cloud accepted (HKMA Circular, Aug 2022); logical isolation, customer-managed keys.</li>
+          <li><strong>06 Cross-Border Data Flow</strong> — PDPO: consent plus safeguards; GBA pilots create mainland arrangements.</li>
+        </ul>
+      </div>
+      <aside class="notes">
+        <p><strong>02</strong> — PCPD guidance encourages the recommended Model Clauses even though s.33 is dormant; the mainland regime may bite on HK entities handling Chinese customers' data.</p>
+        <p><strong>03</strong> — CHATS and FPS run under HKMA / HKICL with direct onshore connectivity for participants; DR is typically intra-territory plus a regional secondary with documented site-resilience.</p>
+        <p><strong>05</strong> — The 2022 circular also introduced the Shared Assessments Programme for CSP due-diligence reuse; zero-trust / segmentation aligns with the C-RAF framework. <strong>06</strong> — GBA pilots include wealth-management connect and mBridge e-CNY experiments.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-21" data-title="Hong Kong (2/3)">
+      <p class="slide-kicker">Jurisdiction 6 of 10 &middot; Domains 07–12</p>
+      <h2 class="slide-title">Hong Kong SAR (2/3)</h2>
+      <div class="slide-body">
+        <ul class="bullets dense">
+          <li><strong>07 Cybersecurity Standards</strong> — CFI 2.0: C-RAF, iCAST attack simulation, CIR development; &lt;24 h reporting.</li>
+          <li><strong>08 API &amp; Open Banking</strong> — Open API Framework Phases I–IV (transactional rolling out); CDI for SME data.</li>
+          <li><strong>09 Cloud &amp; Infrastructure</strong> — SA-2 non-objection for material outsourcing; rehearsed exit plans.</li>
+          <li><strong>10 Licensing &amp; Compliance Tech</strong> — AMLO / JFIU; biometric remote onboarding; iAM Smart digital identity.</li>
+          <li><strong>11 Encryption &amp; Authentication</strong> — TLS 1.2+ per TM-E-1; strong customer authentication; FIPS HSMs onshore.</li>
+          <li><strong>12 Key Legislation</strong> — Banking Ordinance, PDPO, SPM TM-E-1 / SA-2, CFI 2.0, Cloud Circular 2022.</li>
+        </ul>
+      </div>
+      <aside class="notes">
+        <p><strong>07</strong> — CFI 2.0's three pillars: C-RAF assessment, iCAST intelligence-led attack simulation, CIR professional development; SFC and IA publish their own cyber codes; significant disruption is reportable immediately, other material events "as soon as practicable" (&lt;24 h in practice).</p>
+        <p><strong>08</strong> — CDI (Commercial Data Interchange) shares consented corporate data across banks to accelerate SME credit; API security is OAuth 2.0, mTLS, signed JWTs.</p>
+        <p><strong>09</strong> — Concentration-risk assessment formalised; AWS / Azure / Alibaba HK regions widely used. <strong>10</strong> — remote onboarding per HKMA 2019/2020 guidance; SFC VATP licensing (Jun 2023) covers virtual-asset onboarding. <strong>11</strong> — 2FA is a long-standing norm; onshore HSMs preferred for regulator access.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-22" data-title="Hong Kong (3/3)">
+      <p class="slide-kicker">Jurisdiction 6 of 10 &middot; Architectural Implications</p>
+      <h2 class="slide-title">Hong Kong SAR (3/3)</h2>
+      <div class="slide-body">
+        <ul class="bullets">
+          <li>Onshore HK regions for customer data, CHATS / FPS connectivity and the primary system of record; regional DR with proven recovery.</li>
+          <li>Design to C-RAF and iCAST from the outset — threat modelling and SOC maturity belong in the target state.</li>
+          <li>Expose Open-API Phase III/IV endpoints at FAPI grade, with CDI integration for SME credit journeys.</li>
+          <li>Use iAM Smart for consented identity and remote onboarding; fail open to branch where assurance is insufficient.</li>
+          <li>GBA flows: hold mainland customer data to PRC-grade controls — never blend it into the HK-only estate.</li>
+        </ul>
+      </div>
+      <aside class="notes">
+        <p>PRC-grade controls for GBA data means SM-family cryptography and PIPL treatment. The failure mode is a single blended data estate where mainland-origin records silently inherit HK-only controls.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-23" data-title="Singapore (1/3)">
+      <p class="slide-kicker">Jurisdiction 7 of 10 &middot; Domains 01–06</p>
+      <h2 class="slide-title">Singapore (1/3)</h2>
+      <div class="slide-body">
+        <ul class="bullets dense">
+          <li><strong>01 Regulatory Bodies</strong> — MAS (integrated regulator &amp; central bank), PDPC (privacy), CSA (national cyber).</li>
+          <li><strong>02 Data Localization</strong> — no mandate; cross-border processing permitted with timely regulator access.</li>
+          <li><strong>03 System &amp; Process Localization</strong> — MEPS+, FAST, PayNow onshore; offshore processing under controls.</li>
+          <li><strong>04 Legal Entity Segregation</strong> — licence classes per activity; group outsourcing with local CIO / CISO.</li>
+          <li><strong>05 Workload Isolation</strong> — multi-tenant cloud fully accepted; MAS TRM 2021 controls; Cloud Advisory 2021.</li>
+          <li><strong>06 Cross-Border Data Flow</strong> — PDPA: consent plus comparable protection; ASEAN MCCs; APEC CBPR.</li>
+        </ul>
+      </div>
+      <aside class="notes">
+        <p><strong>02</strong> — MAS Notice 658 and outsourcing notices require records retrievable in Singapore with the FI keeping legal custody; CSP representations and warranties expected.</p>
+        <p><strong>03</strong> — Domestic rails run under MAS / ABS governance; DR is principle-based and proportionate — offshore DR allowed if risk-managed with demonstrable recovery to an onshore or equivalently controlled site.</p>
+        <p><strong>04</strong> — Full banks, wholesale banks and DPT licensees under the Payment Services Act 2019; significant FIs need a locally accountable Board IT Committee. <strong>05</strong> — TRM articulates IAM, segregation, encryption, logging; the Cloud Advisory covers concentration risk, exit strategy and continuity; zero-trust and API-gateway security are current supervisory expectations.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-24" data-title="Singapore (2/3)">
+      <p class="slide-kicker">Jurisdiction 7 of 10 &middot; Domains 07–12</p>
+      <h2 class="slide-title">Singapore (2/3)</h2>
+      <div class="slide-body">
+        <ul class="bullets dense">
+          <li><strong>07 Cybersecurity Standards</strong> — TRM 2021; Notice 655 cyber hygiene; Notice 644: 1-hour incident reporting.</li>
+          <li><strong>08 API &amp; Open Banking</strong> — SGFinDex via Singpass; MAS/ABS API Playbook (OAuth 2.0, FAPI, mTLS).</li>
+          <li><strong>09 Cloud &amp; Infrastructure</strong> — outsourcing notices: regulator access, audit, exit clauses; concentration watched.</li>
+          <li><strong>10 Licensing &amp; Compliance Tech</strong> — Notice 626 AML; Singpass / Myinfo eKYC; Singpass Face Verification.</li>
+          <li><strong>11 Encryption &amp; Authentication</strong> — TLS 1.2+ with PFS; MFA universal, SMS-OTP phased out; FIPS L3+ HSMs.</li>
+          <li><strong>12 Key Legislation</strong> — Banking Act, Payment Services Act 2019, PDPA, Cybersecurity Act 2018, MAS TRM + Notices.</li>
+        </ul>
+      </div>
+      <aside class="notes">
+        <p><strong>07</strong> — Notice 655 covers patch, MFA, privilege, malware, secure configuration and security updates; Notice 644 requires a root-cause report within 14 days of the 1-hour notification; AASE adversarial attack simulation applies to systemically important FIs.</p>
+        <p><strong>08</strong> — SGFinDex spans banks, CPF, HDB, IRAS and insurers; open banking is facilitated and standardised rather than compelled. <strong>10</strong> — STRO is the FIU.</p>
+        <p><strong>11</strong> — Key management with dual control and split knowledge. <strong>12</strong> — the Notices family includes 655 / 644 / 634 / 1121 plus the Cloud Advisory 2021; the Cybersecurity Act 2018 carries the CII designation regime.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-25" data-title="Singapore (3/3)">
+      <p class="slide-kicker">Jurisdiction 7 of 10 &middot; Architectural Implications</p>
+      <h2 class="slide-title">Singapore (3/3)</h2>
+      <div class="slide-body">
+        <ul class="bullets">
+          <li>Architect freely across regions — but evidence timely regulator access to records in Singapore, contractually and technically.</li>
+          <li>Bake TRM 2021 and Notice 655 controls into CI/CD — hardening baselines, patch SLAs, MFA, privileged access.</li>
+          <li>Engineer detection-to-notification as a pipeline: the 1-hour Notice 644 SLA needs runbooks and automation.</li>
+          <li>Build on Singpass / Myinfo for onboarding and SGFinDex for data sharing; FAPI-grade security is the minimum bar.</li>
+          <li>Prove exit: portability, data extraction and alternative-provider topologies — tabletop-tested and documented.</li>
+        </ul>
+      </div>
+      <aside class="notes">
+        <p>Singapore trades localization mandates for evidence obligations — the architecture question is not "where may it run" but "can you demonstrate access, control and exit on demand".</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-26" data-title="Malaysia (1/3)">
+      <p class="slide-kicker">Jurisdiction 8 of 10 &middot; Domains 01–06</p>
+      <h2 class="slide-title">Malaysia (1/3)</h2>
+      <div class="slide-body">
+        <ul class="bullets dense">
+          <li><strong>01 Regulatory Bodies</strong> — BNM (banking &amp; payments), SC (securities), JPDP (privacy), NACSA (cyber).</li>
+          <li><strong>02 Data Localization</strong> — BNM concurrence to store customer data offshore; onshore primary expected.</li>
+          <li><strong>03 System &amp; Process Localization</strong> — RENTAS and DuitNow onshore (PayNet); offshore needs concurrence.</li>
+          <li><strong>04 Legal Entity Segregation</strong> — locally-incorporated subsidiaries under FSA / IFSA 2013; local CIO / CISO.</li>
+          <li><strong>05 Workload Isolation</strong> — RMiT: segregation; dedicated environments for core banking and payment switch.</li>
+          <li><strong>06 Cross-Border Data Flow</strong> — PDPA s.129 (2024): comparable protection or consent; BNM concurrence.</li>
+        </ul>
+      </div>
+      <aside class="notes">
+        <p><strong>02</strong> — The Outsourcing Policy Document (2019) requires BNM concurrence for offshore storage in material outsourcing; PDPA 2010 originally ran a whitelist of approved jurisdictions and the 2024 amendments moved to an adequacy model — implementation guidance still pending (Flux).</p>
+        <p><strong>03</strong> — DR is typically onshore for critical systems, regional for non-critical. <strong>04</strong> — board risk / technology committees expected; group platforms permitted with BNM-approved outsourcing and sub-outsourcing controls.</p>
+        <p><strong>05</strong> — RMiT (2020) prescribes production / non-production segregation and strong IAM / privileged access; multi-tenant cloud accepted with concurrence. <strong>06</strong> — cross-border outsourcing risk assessment covers geopolitical, legal and concentration risk.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-27" data-title="Malaysia (2/3)">
+      <p class="slide-kicker">Jurisdiction 8 of 10 &middot; Domains 07–12</p>
+      <h2 class="slide-title">Malaysia (2/3)</h2>
+      <div class="slide-body">
+        <ul class="bullets dense">
+          <li><strong>07 Cybersecurity Standards</strong> — RMiT as the comprehensive standard; Cyber Security Act 2024 adds CII regime.</li>
+          <li><strong>08 API &amp; Open Banking</strong> — BNM Open Data &amp; API policy (2018); PayNet DuitNow APIs; voluntary, FAPI-bound.</li>
+          <li><strong>09 Cloud &amp; Infrastructure</strong> — BNM concurrence for material cloud; MY hyperscale regions arriving 2024–2026.</li>
+          <li><strong>10 Licensing &amp; Compliance Tech</strong> — AMLA 2001; BNM e-KYC Policy (2020) fully digital onboarding; MyDigital ID.</li>
+          <li><strong>11 Encryption &amp; Authentication</strong> — TLS 1.2+, AES-256; MFA mandatory, SMS-OTP being replaced; FIPS L3 HSMs.</li>
+          <li><strong>12 Key Legislation</strong> — FSA / IFSA 2013, PDPA 2010 (amended 2024), Cyber Security Act 2024, RMiT 2020.</li>
+        </ul>
+      </div>
+      <aside class="notes">
+        <p><strong>07</strong> — RMiT spans cyber, cloud, outsourcing, data leakage and resilience; material incidents reportable to BNM promptly with escalation protocols and root-cause timelines; annual penetration testing, SOC capability, threat-led exercises for D-SIBs; the Cyber Security Act 2024 also licenses service providers.</p>
+        <p><strong>08</strong> — Started with product information; converging on FAPI-grade security. <strong>09</strong> — assessment covers CSP resilience, data access, audit rights and exit; AWS / Azure / Google Malaysia regions expected to accelerate onshore adoption.</p>
+        <p><strong>10</strong> — FIED is the FIU; e-KYC requires liveness and document verification. <strong>11</strong> — onshore HSMs preferred for key ceremonies and card issuance; RSA-2048 / ECDSA-P256 standard.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-28" data-title="Malaysia (3/3)">
+      <p class="slide-kicker">Jurisdiction 8 of 10 &middot; Architectural Implications</p>
+      <h2 class="slide-title">Malaysia (3/3)</h2>
+      <div class="slide-body">
+        <ul class="bullets">
+          <li>Default customer data and critical systems onshore; treat cross-border processing as a BNM-approval exercise.</li>
+          <li>Build to RMiT as the baseline controls catalogue; map patterns to its appendices for audit defensibility.</li>
+          <li>New Malaysian hyperscale regions make onshore cloud the path of least friction — revisit legacy offshore choices.</li>
+          <li>BNM-compliant e-KYC with liveness and document verification; engineer for MyDigital ID federation as it matures.</li>
+          <li>Align incident escalation to RMiT; anticipate Cyber Security Act 2024 CII licensing for CSPs and providers.</li>
+        </ul>
+      </div>
+      <aside class="notes">
+        <p>Every cross-border decision comes with a documented risk assessment and exit plan attached — BNM concurrence is a gate, not a formality. The arriving hyperscale regions flip the default: onshore is becoming cheaper than justifying offshore.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-29" data-title="Australia (1/3)">
+      <p class="slide-kicker">Jurisdiction 9 of 10 &middot; Domains 01–06</p>
+      <h2 class="slide-title">Australia (1/3)</h2>
+      <div class="slide-body">
+        <ul class="bullets dense">
+          <li><strong>01 Regulatory Bodies</strong> — APRA (prudential), ASIC, RBA (payments), AUSTRAC (AML), OAIC, ACSC (cyber).</li>
+          <li><strong>02 Data Localization</strong> — no mandate; APRA expects accessible records and effective control; SOCI applies.</li>
+          <li><strong>03 System &amp; Process Localization</strong> — RITS, NPP, BECS onshore; offshore processing under CPS 230 controls.</li>
+          <li><strong>04 Legal Entity Segregation</strong> — branch (FAB) or subsidiary; subsidiary required for retail deposits.</li>
+          <li><strong>05 Workload Isolation</strong> — CPS 234 proportionate controls; public cloud fully accepted; zero-trust standard.</li>
+          <li><strong>06 Cross-Border Data Flow</strong> — Privacy Act APP 8: discloser stays accountable; tranche-2 reform pending.</li>
+        </ul>
+      </div>
+      <aside class="notes">
+        <p><strong>02</strong> — Privacy Act APP 8 keeps the disclosing entity accountable for cross-border data (reasonable-steps obligation); SOCI Act amendments (2022) place critical-infrastructure obligations on banking.</p>
+        <p><strong>03</strong> — Rails run by RBA / NPPA; APRA-notifiable service providers and documented resilience required for offshore processing; DR generally onshore for critical systems, cross-region permissible with demonstrated recovery.</p>
+        <p><strong>04</strong> — CPS 220 (risk management) and CPS 510 (governance) set board-level accountability; material service providers — intra-group or external — fall under CPS 230 from 1 Jul 2025. <strong>05</strong> — APRA cloud information paper (2018, refreshed); MFA, patching SLAs and SOC capability standard. <strong>06</strong> — tranche-1 (2024) added a statutory tort and children's code (Flux).</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-30" data-title="Australia (2/3)">
+      <p class="slide-kicker">Jurisdiction 9 of 10 &middot; Domains 07–12</p>
+      <h2 class="slide-title">Australia (2/3)</h2>
+      <div class="slide-body">
+        <ul class="bullets dense">
+          <li><strong>07 Cybersecurity Standards</strong> — CPS 234 binding; CPS 230 from Jul 2025; SOCI 12 h / 72 h incident reporting.</li>
+          <li><strong>08 API &amp; Open Banking</strong> — CDR legislated: FAPI 1.0 Advanced, mTLS, PAR; DSB standards; ACCC / OAIC.</li>
+          <li><strong>09 Cloud &amp; Infrastructure</strong> — CPS 230 service-provider register, exit testing; sovereign-cloud dialogue.</li>
+          <li><strong>10 Licensing &amp; Compliance Tech</strong> — AML/CTF Act 2006, AUSTRAC; Digital ID Act 2024 phasing in; DVS checks.</li>
+          <li><strong>11 Encryption &amp; Authentication</strong> — TLS 1.2+; ACSC-approved algorithms; MFA per CPS 234; FIPS HSMs onshore.</li>
+          <li><strong>12 Key Legislation</strong> — Banking Act 1959, Privacy Act 1988, SOCI Act, CPS 234 / 230, CDR Act 2019, Digital ID Act.</li>
+        </ul>
+      </div>
+      <aside class="notes">
+        <p><strong>07</strong> — CPS 230 supersedes CPS 231/232 for outsourcing / BCM and introduces service-provider registers and impact tolerances; SOCI RMP rules add risk-management-program obligations; ACSC Essential Eight widely adopted with ISO 27001 / NIST CSF mappings.</p>
+        <p><strong>08</strong> — CDR is operational across banking and energy and expanding; insurance, super and non-bank lending arrive in tranches with reform debate ongoing 2025–26.</p>
+        <p><strong>10</strong> — TTR / SMR obligations; myGovID rebranded under the interoperable Digital ID framework; VoI standards common. <strong>11</strong> — AACP guides classified-data protection and informs financial baselines; onshore preferred for customer-authentication keys and CDR cryptographic material.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-31" data-title="Australia (3/3)">
+      <p class="slide-kicker">Jurisdiction 9 of 10 &middot; Architectural Implications</p>
+      <h2 class="slide-title">Australia (3/3)</h2>
+      <div class="slide-body">
+        <ul class="bullets">
+          <li>Adopt CPS 230 impact tolerances as first-class architectural inputs — they drive capacity, resilience and dependency design.</li>
+          <li>Build to CPS 234 control objectives mapped to APRA-expected evidence — the source of truth for assurance scope.</li>
+          <li>Expose CDR endpoints at FAPI 1.0 Advanced; treat the consent dashboard as a product-grade feature.</li>
+          <li>Register material service providers; pre-plan SOCI 12-hour / 72-hour incident workflows end-to-end.</li>
+          <li>Use the Digital ID Act 2024 federation as the strategic identity source; keep DVS / VoI fallback for edge cases.</li>
+        </ul>
+      </div>
+      <aside class="notes">
+        <p>Impact tolerances turn BCM from a document into a design constraint: each critical operation carries a tolerance that caps acceptable downtime and data loss, which flows straight into capacity and dependency choices. DSB register integration is part of the CDR product surface.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-32" data-title="Thailand (1/3)">
+      <p class="slide-kicker">Jurisdiction 10 of 10 &middot; Domains 01–06</p>
+      <h2 class="slide-title">Thailand (1/3)</h2>
+      <div class="slide-body">
+        <ul class="bullets dense">
+          <li><strong>01 Regulatory Bodies</strong> — BOT (banks &amp; payments), SEC / OIC, PDPC (privacy), NCSA (cyber), ETDA.</li>
+          <li><strong>02 Data Localization</strong> — no general law; BOT can impose onshore licence conditions; PDPA restricts transfer.</li>
+          <li><strong>03 System &amp; Process Localization</strong> — BAHTNET, PromptPay, ICAS onshore; offshore with BOT approval.</li>
+          <li><strong>04 Legal Entity Segregation</strong> — branches / subsidiaries under FIBA 2008; local IT and cyber governance.</li>
+          <li><strong>05 Workload Isolation</strong> — public cloud accepted; core banking and payment switching isolated or dedicated.</li>
+          <li><strong>06 Cross-Border Data Flow</strong> — PDPA: adequacy, BCRs, SCCs or consent; BOT may condition outsourcing.</li>
+        </ul>
+      </div>
+      <aside class="notes">
+        <p><strong>02</strong> — PDPA (2019, in force 2022); the BOT IT-risk notification expects regulator access to records in Thailand. <strong>03</strong> — offshore processing requires BOT notification / approval and ongoing oversight; DR typically onshore for critical systems, regional acceptable with demonstrated recovery.</p>
+        <p><strong>04</strong> — Board-level oversight expected; intra-group service arrangements permitted with BOT-compliant outsourcing governance. <strong>05</strong> — the IT and cyber risk notification prescribes IAM, production / non-production segregation and logging controls.</p>
+        <p><strong>06</strong> — Adequacy is determined by the PDPC. ETDA covers digital-ID and trust services.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-33" data-title="Thailand (2/3)">
+      <p class="slide-kicker">Jurisdiction 10 of 10 &middot; Domains 07–12</p>
+      <h2 class="slide-title">Thailand (2/3)</h2>
+      <div class="slide-body">
+        <ul class="bullets dense">
+          <li><strong>07 Cybersecurity Standards</strong> — BOT IT-risk notification + CRAF; PDPA breaches to PDPC within 72 h.</li>
+          <li><strong>08 API &amp; Open Banking</strong> — open-banking framework advancing; PromptPay / PromptBiz de facto APIs.</li>
+          <li><strong>09 Cloud &amp; Infrastructure</strong> — BOT IT Outsourcing Notification; Thai hyperscale regions emerging.</li>
+          <li><strong>10 Licensing &amp; Compliance Tech</strong> — AMLA 1999 (AMLO as FIU); NDID federated eKYC; biometric onboarding.</li>
+          <li><strong>11 Encryption &amp; Authentication</strong> — TLS 1.2+; MFA for high-risk access; ETDA PKI; FIPS L3 HSMs onshore.</li>
+          <li><strong>12 Key Legislation</strong> — FIBA 2008, PDPA 2019, Cybersecurity Act 2019, BOT IT Risk &amp; Outsourcing Notifications.</li>
+        </ul>
+      </div>
+      <aside class="notes">
+        <p><strong>07</strong> — The Cybersecurity Act 2019 designates CII and lets the NCSA demand incident reporting and preventive measures; incidents go to BOT promptly; ISO 27001, NIST CSF and PCI-DSS widely adopted.</p>
+        <p><strong>08</strong> — Driven by the Financial Landscape Consultation (2022 and subsequent directions); ETDA digital-services standards inform the API security baseline. <strong>09</strong> — material outsourcing needs notification / non-objection with demonstrable controls; AWS Bangkok, Google and Azure Thailand regions reduce onshore friction.</p>
+        <p><strong>10</strong> — NDID is BOT- and ETDA-endorsed; facial-recognition onboarding permitted under BOT eKYC guidance. <strong>11</strong> — onshore HSMs preferred for PromptPay / domestic card rails.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-34" data-title="Thailand (3/3)">
+      <p class="slide-kicker">Jurisdiction 10 of 10 &middot; Architectural Implications</p>
+      <h2 class="slide-title">Thailand (3/3)</h2>
+      <div class="slide-body">
+        <ul class="bullets">
+          <li>Keep BAHTNET / PromptPay / ICAS connectivity and supporting workloads onshore; align primary data to Thai regions as they mature.</li>
+          <li>Integrate NDID as the default eKYC and step-up evidence; identity journeys degrade gracefully without it.</li>
+          <li>Build to BOT IT-risk and cyber-resilience expectations; mirror the CRAF controls into the operating model.</li>
+          <li>Engineer PDPA into identity, marketing and analytics — 72-hour breach notice, consent, cross-border safeguards.</li>
+          <li>Treat BOT outsourcing rules as gated decisions — material changes assume a consultation cycle, not post-hoc notice.</li>
+        </ul>
+      </div>
+      <aside class="notes">
+        <p>Thailand pairs a light statutory floor with an approval-driven supervisory culture: the binding constraint is usually the BOT consultation cycle in the project plan, not a localization statute.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-35" data-title="Severity Matrix (1/2)">
+      <p class="slide-kicker">Comparative Matrix</p>
+      <h2 class="slide-title">Localization &amp; Isolation Severity (1/2)</h2>
+      <div class="slide-body">
+        <div class="table-wrap">
+          <table class="compare">
+            <thead>
+              <tr>
+                <th scope="col">Jurisdiction</th>
+                <th scope="col">Data Localization</th>
+                <th scope="col">System / Process</th>
+                <th scope="col">Legal Entity</th>
+                <th scope="col">Workload Isolation</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">China<span class="jur-code">CN</span></th><td><span class="sev-strict">Strict</span></td><td><span class="sev-strict">Strict</span></td><td><span class="sev-strict">Strict</span></td><td><span class="sev-strict">Strict</span></td></tr>
+              <tr><th scope="row">India<span class="jur-code">IN</span></th><td><span class="sev-strict">Strict</span></td><td><span class="sev-strict">Strict</span></td><td><span class="sev-moderate">Moderate</span></td><td><span class="sev-moderate">Moderate</span></td></tr>
+              <tr><th scope="row">Indonesia<span class="jur-code">ID</span></th><td><span class="sev-moderate">Moderate</span></td><td><span class="sev-strict">Strict</span></td><td><span class="sev-moderate">Moderate</span></td><td><span class="sev-moderate">Moderate</span></td></tr>
+              <tr><th scope="row">Malaysia<span class="jur-code">MY</span></th><td><span class="sev-moderate">Moderate</span></td><td><span class="sev-moderate">Moderate</span></td><td><span class="sev-moderate">Moderate</span></td><td><span class="sev-moderate">Moderate</span></td></tr>
+              <tr><th scope="row">Taiwan<span class="jur-code">TW</span></th><td><span class="sev-moderate">Moderate</span></td><td><span class="sev-moderate">Moderate</span></td><td><span class="sev-moderate">Moderate</span></td><td><span class="sev-moderate">Moderate</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="table-note">Severity reflects the binding floor, not aspiration.</p>
+      </div>
+      <aside class="notes">
+        <p>Scoring across the four dimensions that most materially determine deployment topology: where data lives, where processing runs, whether a local legal entity is compelled, and how strictly workloads must be segregated. Continued on the next slide with the five lighter-rated jurisdictions.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-36" data-title="Severity Matrix (2/2)">
+      <p class="slide-kicker">Comparative Matrix</p>
+      <h2 class="slide-title">Localization &amp; Isolation Severity (2/2)</h2>
+      <div class="slide-body">
+        <div class="table-wrap">
+          <table class="compare">
+            <thead>
+              <tr>
+                <th scope="col">Jurisdiction</th>
+                <th scope="col">Data Localization</th>
+                <th scope="col">System / Process</th>
+                <th scope="col">Legal Entity</th>
+                <th scope="col">Workload Isolation</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">Thailand<span class="jur-code">TH</span></th><td><span class="sev-light">Light</span></td><td><span class="sev-moderate">Moderate</span></td><td><span class="sev-light">Light</span></td><td><span class="sev-moderate">Moderate</span></td></tr>
+              <tr><th scope="row">Hong Kong<span class="jur-code">HK</span></th><td><span class="sev-light">Light</span></td><td><span class="sev-moderate">Moderate</span></td><td><span class="sev-light">Light</span></td><td><span class="sev-moderate">Moderate</span></td></tr>
+              <tr><th scope="row">Singapore<span class="jur-code">SG</span></th><td><span class="sev-light">Light</span></td><td><span class="sev-light">Light</span></td><td><span class="sev-light">Light</span></td><td><span class="sev-moderate">Moderate</span></td></tr>
+              <tr><th scope="row">Japan<span class="jur-code">JP</span></th><td><span class="sev-light">Light</span></td><td><span class="sev-light">Light</span></td><td><span class="sev-light">Light</span></td><td><span class="sev-moderate">Moderate</span></td></tr>
+              <tr><th scope="row">Australia<span class="jur-code">AU</span></th><td><span class="sev-none">None</span></td><td><span class="sev-light">Light</span></td><td><span class="sev-light">Light</span></td><td><span class="sev-moderate">Moderate</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="table-note">Author's assessment of binding rules as of 17 April 2026 — a design-input heuristic, not a legal conclusion.</p>
+      </div>
+      <aside class="notes">
+        <p>All multi-tenant workload placement requires institution-level controls regardless of the matrix score; the Workload Isolation rating captures the minimum segregation expectation. Note the uniform moderate isolation floor across even the lightest jurisdictions.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-37" data-title="Matrix — Anchors (1/2)">
+      <p class="slide-kicker">Comparative Matrix</p>
+      <h2 class="slide-title">Notable anchors (1/2)</h2>
+      <div class="slide-body">
+        <div class="table-wrap">
+          <table class="compare">
+            <thead>
+              <tr>
+                <th scope="col">Jurisdiction</th>
+                <th scope="col">Notable anchor</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">China<span class="jur-code">CN</span></th><td>CSL / DSL / PIPL &middot; MLPS 2.0 &middot; SM crypto</td></tr>
+              <tr><th scope="row">India<span class="jur-code">IN</span></th><td>RBI payment-data localization (2018)</td></tr>
+              <tr><th scope="row">Indonesia<span class="jur-code">ID</span></th><td>BI PBI 19/14/PBI/2017 &middot; OJK POJK 11/2022</td></tr>
+              <tr><th scope="row">Malaysia<span class="jur-code">MY</span></th><td>BNM RMiT &middot; Outsourcing Policy</td></tr>
+              <tr><th scope="row">Taiwan<span class="jur-code">TW</span></th><td>FSC Outsourcing Regulations</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <aside class="notes">
+        <p>The anchor column names the binding instrument that sets each jurisdiction's severity floor — the citation an architect should read first.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-38" data-title="Matrix — Anchors (2/2)">
+      <p class="slide-kicker">Comparative Matrix</p>
+      <h2 class="slide-title">Notable anchors (2/2)</h2>
+      <div class="slide-body">
+        <div class="table-wrap">
+          <table class="compare">
+            <thead>
+              <tr>
+                <th scope="col">Jurisdiction</th>
+                <th scope="col">Notable anchor</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">Thailand<span class="jur-code">TH</span></th><td>BOT IT risk / outsourcing notifications</td></tr>
+              <tr><th scope="row">Hong Kong<span class="jur-code">HK</span></th><td>HKMA SA-2 / TM-E-1 &middot; CFI 2.0</td></tr>
+              <tr><th scope="row">Singapore<span class="jur-code">SG</span></th><td>MAS TRM &middot; Notices 655 / 644</td></tr>
+              <tr><th scope="row">Japan<span class="jur-code">JP</span></th><td>FISC Security Guidelines &middot; APPI</td></tr>
+              <tr><th scope="row">Australia<span class="jur-code">AU</span></th><td>APRA CPS 234 / CPS 230 &middot; CDR &middot; SOCI</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <aside class="notes">
+        <p>Same anchor column, continued for the five lighter-rated jurisdictions in the severity split.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-39" data-title="Comparison Lab">
+      <p class="slide-kicker">Comparison Lab</p>
+      <h2 class="slide-title">Side-by-side severity profiles</h2>
+      <div class="slide-body">
+        <ul class="bullets">
+          <li>Select up to three jurisdictions — their binding-severity profiles compared across the four topology-shaping dimensions.</li>
+          <li>Built for triaging a regional build: pick a primary, a secondary, and an exception.</li>
+        </ul>
+      </div>
+      <aside class="notes">
+        <p>The Comparison Lab is an interactive widget on the source page — the deck carries its purpose; the tool itself runs in the browser next to the heat map and matrix data.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-40" data-title="Architecture Decision Flow">
+      <p class="slide-kicker">Architecture Decision Flow</p>
+      <h2 class="slide-title">Where does this workload live?</h2>
+      <div class="slide-body">
+        <ul class="bullets">
+          <li>A compact decision tree for siting a new workload — start at the top.</li>
+          <li>Follow the path that matches your data classification, jurisdiction and regulator posture.</li>
+          <li>Terminal nodes give the binding architecture the rule set implies — not a legal conclusion.</li>
+          <li><strong>Corrections welcome</strong> — the brief is actively maintained; report out-of-date circulars, ambiguities, or jurisdictions to add.</li>
+        </ul>
+      </div>
+      <aside class="notes">
+        <p>The decision tree itself renders interactively on the source page and does not travel into the deck — walk it live when presenting, or narrate the classification-first logic: data class, then jurisdiction, then regulator posture.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-41" data-title="Glossary — Regulators (1/3)">
+      <p class="slide-kicker">Glossary</p>
+      <h2 class="slide-title">Regulators &amp; Supervisory Bodies (1/3)</h2>
+      <div class="slide-body">
+        <div class="table-wrap">
+          <table class="compare tight">
+            <thead>
+              <tr>
+                <th scope="col" class="w-term">Term</th>
+                <th scope="col" class="w-name">Full name</th>
+                <th scope="col">Definition</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">BI</th><td>Bank Indonesia</td><td>Central bank; PBI instruments mandate onshore processing for domestic payments.</td></tr>
+              <tr><th scope="row">OJK</th><td>Otoritas Jasa Keuangan</td><td>Integrated financial authority; POJK circulars govern IT risk and data.</td></tr>
+              <tr><th scope="row">RBI</th><td>Reserve Bank of India</td><td>Central bank; authored the 2018 payment-data localization circular.</td></tr>
+              <tr><th scope="row">FSC</th><td>Financial Supervisory Commission</td><td>Taiwan's unified regulator; Outsourcing Regulations govern cloud use.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <aside class="notes">
+        <p>The glossary covers abbreviations, instruments and architectural terms used throughout the brief; on the source page it is filterable by category and searchable. Definitions here are condensed — the page carries the full text.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-42" data-title="Glossary — Regulators (2/3)">
+      <p class="slide-kicker">Glossary</p>
+      <h2 class="slide-title">Regulators &amp; Supervisory Bodies (2/3)</h2>
+      <div class="slide-body">
+        <div class="table-wrap">
+          <table class="compare tight">
+            <thead>
+              <tr>
+                <th scope="col" class="w-term">Term</th>
+                <th scope="col" class="w-name">Full name</th>
+                <th scope="col">Definition</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">FISC</th><td>Center for Financial Industry Information Systems</td><td>Industry body; its Security Guidelines are Japan's de facto baseline.</td></tr>
+              <tr><th scope="row">CAC</th><td>Cyberspace Administration of China</td><td>Administers cross-border transfer assessments under CSL / DSL / PIPL.</td></tr>
+              <tr><th scope="row">HKMA</th><td>Hong Kong Monetary Authority</td><td>Supervises authorized institutions; issues SA-2, TM-E-1 and CFI 2.0.</td></tr>
+              <tr><th scope="row">MAS</th><td>Monetary Authority of Singapore</td><td>Central bank and regulator; TRM Guidelines and Notices 655 / 644.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <aside class="notes">
+        <p>FISC is an industry body rather than a statutory regulator — its guidelines carry weight because FSA examinations test against them.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-43" data-title="Glossary — Regulators (3/3)">
+      <p class="slide-kicker">Glossary</p>
+      <h2 class="slide-title">Regulators &amp; Supervisory Bodies (3/3)</h2>
+      <div class="slide-body">
+        <div class="table-wrap">
+          <table class="compare tight">
+            <thead>
+              <tr>
+                <th scope="col" class="w-term">Term</th>
+                <th scope="col" class="w-name">Full name</th>
+                <th scope="col">Definition</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">BNM</th><td>Bank Negara Malaysia</td><td>Central bank; issues RMiT and the binding Outsourcing Policy Document.</td></tr>
+              <tr><th scope="row">APRA</th><td>Australian Prudential Regulation Authority</td><td>Prudential regulator; issues the CPS standards including 234 and 230.</td></tr>
+              <tr><th scope="row">BOT</th><td>Bank of Thailand</td><td>Central bank; IT Risk and Outsourcing Notifications govern cloud adoption.</td></tr>
+              <tr><th scope="row">PDPC</th><td>Personal Data Protection Commission</td><td>Data-protection authority in SG, TH, MY; enforces PDPA and breach notice.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <aside class="notes">
+        <p>APRA's remit spans ADIs, insurers and superannuation funds. The PDPC title is used, with local variations, in Singapore, Thailand and Malaysia.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-44" data-title="Glossary — Instruments (1/5)">
+      <p class="slide-kicker">Glossary</p>
+      <h2 class="slide-title">Legal Instruments &amp; Prudential Standards (1/5)</h2>
+      <div class="slide-body">
+        <div class="table-wrap">
+          <table class="compare tight">
+            <thead>
+              <tr>
+                <th scope="col" class="w-term">Term</th>
+                <th scope="col" class="w-name">Full name</th>
+                <th scope="col">Definition</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">PBI</th><td>Peraturan Bank Indonesia</td><td>Binding BI regulation; PBI 19/14/PBI/2017 is the payment-localization rule.</td></tr>
+              <tr><th scope="row">POJK</th><td>Peraturan OJK</td><td>Binding OJK circular; POJK 11/2022 sets bank IT-risk requirements.</td></tr>
+              <tr><th scope="row">GR 71/2019</th><td>Government Regulation 71 of 2019</td><td>Indonesia: splits public-sector ESOs (onshore-only) from private-sector ESOs.</td></tr>
+              <tr><th scope="row">Master Direction</th><td>RBI Master Direction</td><td>Consolidated RBI guidance; IT Outsourcing and IT Governance (2023) frame cloud use.</td></tr>
+              <tr><th scope="row">DPDP Act</th><td>Digital Personal Data Protection Act 2023</td><td>India's omnibus data law; consent-based processing, negative-list transfers.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <aside class="notes">
+        <p>Twenty-one instruments across five slides, in source order — Indonesia and India first, then Japan and the PRC statutes, the Hong Kong and Singapore frameworks, and the Malaysian and Australian standards.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-45" data-title="Glossary — Instruments (2/5)">
+      <p class="slide-kicker">Glossary</p>
+      <h2 class="slide-title">Legal Instruments &amp; Prudential Standards (2/5)</h2>
+      <div class="slide-body">
+        <div class="table-wrap">
+          <table class="compare tight">
+            <thead>
+              <tr>
+                <th scope="col" class="w-term">Term</th>
+                <th scope="col" class="w-name">Full name</th>
+                <th scope="col">Definition</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">APPI</th><td>Act on Protection of Personal Information</td><td>Japan's privacy statute; consent and adequacy tests for cross-border transfer.</td></tr>
+              <tr><th scope="row">CSL</th><td>Cybersecurity Law (2017)</td><td>Foundational PRC statute; CIIO designation and onshore-storage mandate.</td></tr>
+              <tr><th scope="row">DSL</th><td>Data Security Law (2021)</td><td>Classifies data General / Important / Core; regulates transfer accordingly.</td></tr>
+              <tr><th scope="row">PIPL</th><td>Personal Information Protection Law (2021)</td><td>GDPR-style statute; transfers need a standard contract, CAC assessment, or certification.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <aside class="notes">
+        <p>CSL, DSL and PIPL operate as a trio: CSL sets the CIIO perimeter, DSL grades the data, PIPL governs the personal-data transfer routes.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-46" data-title="Glossary — Instruments (3/5)">
+      <p class="slide-kicker">Glossary</p>
+      <h2 class="slide-title">Legal Instruments &amp; Prudential Standards (3/5)</h2>
+      <div class="slide-body">
+        <div class="table-wrap">
+          <table class="compare tight">
+            <thead>
+              <tr>
+                <th scope="col" class="w-term">Term</th>
+                <th scope="col" class="w-name">Full name</th>
+                <th scope="col">Definition</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">MLPS 2.0</th><td>Multi-Level Protection Scheme 2.0</td><td>PRC graded classification (Levels 1–5); financial workloads typically Level 3+.</td></tr>
+              <tr><th scope="row">SA-2</th><td>HKMA Supervisory Policy Manual SA-2</td><td>Outsourcing policy; cloud adoption, exit planning, supervisory-access rights.</td></tr>
+              <tr><th scope="row">TM-E-1</th><td>HKMA TM-E-1 Risk Management of E-Banking</td><td>E-banking risk guidance; referenced for cloud resilience and customer data.</td></tr>
+              <tr><th scope="row">CFI 2.0</th><td>Cyber Fortification Initiative 2.0</td><td>HKMA's tiered cyber-resilience framework (C-RAF / iCAST); rolling out to 2026.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <aside class="notes">
+        <p>The three HKMA entries divide the ground: SA-2 covers outsourcing, TM-E-1 covers e-banking risk, and CFI 2.0 carries the cyber-resilience programme.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-47" data-title="Glossary — Instruments (4/5)">
+      <p class="slide-kicker">Glossary</p>
+      <h2 class="slide-title">Legal Instruments &amp; Prudential Standards (4/5)</h2>
+      <div class="slide-body">
+        <div class="table-wrap">
+          <table class="compare tight">
+            <thead>
+              <tr>
+                <th scope="col" class="w-term">Term</th>
+                <th scope="col" class="w-name">Full name</th>
+                <th scope="col">Definition</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">TRM</th><td>MAS Technology Risk Management Guidelines</td><td>Principles-based IT-risk framework; anchors cyber hygiene and third-party controls.</td></tr>
+              <tr><th scope="row">Notice 655 / 644</th><td>MAS Notices on Cyber Hygiene / Tech Risk</td><td>Binding baseline cyber-hygiene controls and reporting obligations.</td></tr>
+              <tr><th scope="row">RMiT</th><td>Risk Management in Technology</td><td>BNM's prescriptive IT-risk, cloud-adoption and outsourcing requirements.</td></tr>
+              <tr><th scope="row">CPS 234</th><td>APRA Prudential Standard CPS 234 — Information Security</td><td>Binding infosec standard; board accountability, control testing, incident notice.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <aside class="notes">
+        <p>TRM binds MAS-regulated entities despite being principles-based; the Notices carry the prescriptive floor beneath it.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-48" data-title="Glossary — Instruments (5/5)">
+      <p class="slide-kicker">Glossary</p>
+      <h2 class="slide-title">Legal Instruments &amp; Prudential Standards (5/5)</h2>
+      <div class="slide-body">
+        <div class="table-wrap">
+          <table class="compare tight">
+            <thead>
+              <tr>
+                <th scope="col" class="w-term">Term</th>
+                <th scope="col" class="w-name">Full name</th>
+                <th scope="col">Definition</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">CPS 230</th><td>APRA Prudential Standard CPS 230 — Operational Risk</td><td>Operational-risk and service-provider standard; in force from July 2025.</td></tr>
+              <tr><th scope="row">SOCI</th><td>Security of Critical Infrastructure Act</td><td>Australia's CI regime; asset register, risk management, mandatory incident reporting.</td></tr>
+              <tr><th scope="row">CDR</th><td>Consumer Data Right</td><td>Australia's data-portability regime; accredits recipients, governs open banking.</td></tr>
+              <tr><th scope="row">PDPA</th><td>Personal Data Protection Act</td><td>Data statute in SG, TH and MY (local variations); consent, purpose, transfer.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <aside class="notes">
+        <p>Three PDPA statutes share a name but differ materially — Singapore's (2012, amended 2020), Thailand's (2019, in force 2022) and Malaysia's (2010, amended 2024) each carry their own transfer mechanics. CPS 230 has been in force since 1 July 2025.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-49" data-title="Glossary — Concepts (1/3)">
+      <p class="slide-kicker">Glossary</p>
+      <h2 class="slide-title">Architectural &amp; Security Concepts (1/3)</h2>
+      <div class="slide-body">
+        <div class="table-wrap">
+          <table class="compare tight">
+            <thead>
+              <tr>
+                <th scope="col" class="w-term">Term</th>
+                <th scope="col" class="w-name">Full name</th>
+                <th scope="col">Definition</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">Data Localization</th><td>Onshore storage mandate</td><td>Binding requirement to store data in-country — often extends to processing and backups.</td></tr>
+              <tr><th scope="row">Data Residency</th><td>Contractual location commitment</td><td>Softer than localization — a commercial commitment to a chosen region.</td></tr>
+              <tr><th scope="row">Workload Isolation</th><td>Tenant / network / compute separation</td><td>Segregating regulated workloads at network, compute, identity or key layers.</td></tr>
+              <tr><th scope="row">Legal Entity</th><td>In-country incorporated operator</td><td>A local licensed entity must operate the system — constrains the control plane.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <aside class="notes">
+        <p>Localization versus residency is the distinction that decides whether a rule is a statute problem or a contract problem.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-50" data-title="Glossary — Concepts (2/3)">
+      <p class="slide-kicker">Glossary</p>
+      <h2 class="slide-title">Architectural &amp; Security Concepts (2/3)</h2>
+      <div class="slide-body">
+        <div class="table-wrap">
+          <table class="compare tight">
+            <thead>
+              <tr>
+                <th scope="col" class="w-term">Term</th>
+                <th scope="col" class="w-name">Full name</th>
+                <th scope="col">Definition</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">Sovereign Cloud</th><td>Jurisdictionally-bounded cloud region</td><td>Region under local law — staffing, key custody, admin access confined in-country.</td></tr>
+              <tr><th scope="row">HSM</th><td>Hardware Security Module</td><td>Tamper-resistant key device; mandated for card-network and PII workloads.</td></tr>
+              <tr><th scope="row">BYOK / HYOK</th><td>Bring / Hold Your Own Key</td><td>Customer-controlled keys in cloud KMS; HYOK keeps keys outside the provider.</td></tr>
+              <tr><th scope="row">SM Crypto</th><td>Shangmi national cryptographic standards</td><td>PRC national algorithms (SM2 / SM3 / SM4) required for regulated systems.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <aside class="notes">
+        <p>HYOK often means a customer-operated HSM holding the key entirely outside the provider's boundary — the strongest form of the sovereign-cloud key-custody idea.</p>
+      </aside>
+    </section>
+
+    <section class="slide" id="slide-51" data-title="Glossary — Concepts (3/3)">
+      <p class="slide-kicker">Glossary</p>
+      <h2 class="slide-title">Architectural &amp; Security Concepts (3/3)</h2>
+      <div class="slide-body">
+        <div class="table-wrap">
+          <table class="compare tight">
+            <thead>
+              <tr>
+                <th scope="col" class="w-term">Term</th>
+                <th scope="col" class="w-name">Full name</th>
+                <th scope="col">Definition</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">BCP / DR</th><td>Business Continuity / Disaster Recovery</td><td>Operation through disruption; regulators prescribe RTO / RPO targets and drills.</td></tr>
+              <tr><th scope="row">CIIO</th><td>Critical Information Infrastructure Operator</td><td>CSL designation triggering onshore storage and heightened supervision.</td></tr>
+              <tr><th scope="row">Supervisory Access</th><td>Regulator inspection rights</td><td>Contractual and technical regulator access to outsourced systems and logs.</td></tr>
+              <tr><th scope="row">Exit Plan</th><td>Third-party unwind blueprint</td><td>Documented transition off a critical outsourced service inside a defined window.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <aside class="notes">
+        <p>Supervisory access and exit plans appear in nearly every APAC outsourcing rule — they are the two clauses to negotiate with a CSP before architecture work starts.</p>
+      </aside>
+    </section>
+
+    <section class="slide slide-closing" id="slide-52" data-title="Closing">
+      <p class="slide-kicker">Thanks</p>
+      <h2>Thank you</h2>
+      <p class="deck-lede">Regulator circulars, distilled into deployment decisions — a design-input heuristic, not a legal conclusion. Verify any rule with qualified counsel before design commitment.</p>
+      <ul class="branding" aria-label="Personal links">
+        <li><a href="https://github.com/jamesbuckett" rel="noopener noreferrer" target="_blank">
+          <!-- Lucide: github -->
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+          GitHub
+        </a></li>
+        <li><a href="https://twitter.com/jamesbuckett" rel="noopener noreferrer" target="_blank">
+          <!-- Lucide: twitter (x glyph) -->
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4l11.733 16h4.267l-11.733 -16z"/><path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772"/></svg>
+          Twitter / X
+        </a></li>
+        <li><a href="https://www.linkedin.com/in/jamesbuckett" rel="noopener noreferrer" target="_blank">
+          <!-- Lucide: linkedin -->
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+          LinkedIn
+        </a></li>
+      </ul>
+      <aside class="notes">
+        <p>The brief is actively maintained — out-of-date circulars, ambiguities, and jurisdictions worth adding are all welcome as corrections. Closing beat: restate that every rating in this deck traces to a binding instrument, and invite questions.</p>
+      </aside>
+    </section>
+
+    <!-- SLIDES:END -->
+  </main>
+
+  <div class="deck-controls">
+    <button id="nav-prev" class="icon-button" type="button" aria-label="Previous slide" aria-keyshortcuts="ArrowLeft" title="Previous slide (Left arrow)">
+      <!-- Lucide: chevron-left -->
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <span id="slide-counter" aria-live="polite">1 / 1</span>
+    <button id="nav-next" class="icon-button" type="button" aria-label="Next slide" aria-keyshortcuts="ArrowRight" title="Next slide (Right arrow)">
+      <!-- Lucide: chevron-right -->
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+    <span class="key-hint" aria-hidden="true">O overview &middot; N notes</span>
+  </div>
+
+  <div class="overview" id="overview" role="dialog" aria-modal="true" aria-label="Slide overview">
+    <div class="overview-head">
+      <h2>Overview</h2>
+      <p>Enter jumps to a slide &middot; Esc closes</p>
+    </div>
+    <div class="overview-grid" id="overview-grid"></div>
+  </div>
+
+  <aside class="notes-panel" id="notes-panel" role="region" aria-label="Speaker notes" aria-live="polite"></aside>
+
+  <script>
+    (function () {
+      // Theme bootstrap — same pattern as skill-style-guide's template:
+      // stored preference wins, otherwise honour the OS scheme on first visit.
+      const root = document.documentElement;
+      const stored = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      root.setAttribute('data-theme', stored ?? (prefersDark ? 'dark' : 'light'));
+      document.getElementById('theme-toggle')?.addEventListener('click', () => {
+        const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        root.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+      });
+
+      // ---------------------------------------------------------------
+      // Deck engine
+      // ---------------------------------------------------------------
+      const stage = document.getElementById('stage');
+      const slides = Array.from(document.querySelectorAll('.slide'));
+      const counter = document.getElementById('slide-counter');
+      const prevBtn = document.getElementById('nav-prev');
+      const nextBtn = document.getElementById('nav-next');
+      const overview = document.getElementById('overview');
+      const overviewGrid = document.getElementById('overview-grid');
+      const notesPanel = document.getElementById('notes-panel');
+      const DESIGN_W = 1280;
+      const DESIGN_H = 720;
+      let current = 0;
+
+      // Scale the 1280x720 stage to fit the viewport (letterboxing on
+      // mismatched aspect ratios) and shift it up when the notes panel is open.
+      function fit() {
+        const notesH = document.body.classList.contains('notes-open')
+          ? notesPanel.getBoundingClientRect().height : 0;
+        const scale = Math.min(window.innerWidth / DESIGN_W, (window.innerHeight - notesH) / DESIGN_H);
+        stage.style.setProperty('--deck-scale', String(scale));
+        stage.style.setProperty('--notes-shift', (notesH / 2) + 'px');
+      }
+
+      function slideLabel(slide, i) {
+        const heading = slide.querySelector('h1, h2, h3');
+        return slide.dataset.title || (heading ? heading.textContent.trim() : 'Slide ' + (i + 1));
+      }
+
+      function goTo(n, opts = {}) {
+        current = Math.max(0, Math.min(slides.length - 1, n));
+        slides.forEach((s, i) => s.classList.toggle('is-current', i === current));
+        counter.textContent = (current + 1) + ' / ' + slides.length;
+        prevBtn.disabled = current === 0;
+        nextBtn.disabled = current === slides.length - 1;
+        if (opts.updateHash !== false) {
+          history.replaceState(null, '', '#/' + slides[current].id);
+        }
+        syncNotes();
+        syncOverview();
+      }
+      const next = () => goTo(current + 1);
+      const prev = () => goTo(current - 1);
+
+      function parseHash(hash) {
+        const m = /^#\/(slide-\d+)$/.exec(hash || '');
+        if (!m) return null;
+        const idx = slides.findIndex((s) => s.id === m[1]);
+        return idx >= 0 ? idx : null;
+      }
+
+      // Overview grid — one keyboard-focusable card per slide.
+      slides.forEach((slide, i) => {
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.className = 'ov-card';
+        const num = document.createElement('span');
+        num.className = 'ov-num';
+        num.textContent = String(i + 1).padStart(2, '0');
+        const title = document.createElement('span');
+        title.className = 'ov-title';
+        title.textContent = slideLabel(slide, i);
+        card.append(num, title);
+        card.addEventListener('click', () => { goTo(i); toggleOverview(false); });
+        overviewGrid.append(card);
+      });
+      const cards = Array.from(overviewGrid.children);
+
+      function syncOverview() {
+        cards.forEach((c, i) => {
+          if (i === current) c.setAttribute('aria-current', 'true');
+          else c.removeAttribute('aria-current');
+        });
+      }
+
+      function toggleOverview(force) {
+        const open = force ?? !document.body.classList.contains('overview-open');
+        document.body.classList.toggle('overview-open', open);
+        if (open) cards[current]?.focus();
+        else stage.focus({ preventScroll: true });
+      }
+
+      function syncNotes() {
+        if (!document.body.classList.contains('notes-open')) return;
+        const notes = slides[current].querySelector('.notes');
+        notesPanel.innerHTML = '<span class="notes-label">Notes &mdash; slide ' + (current + 1) + '</span>'
+          + (notes ? notes.innerHTML : '<p class="notes-empty">No notes for this slide.</p>');
+      }
+
+      function toggleNotes() {
+        document.body.classList.toggle('notes-open');
+        syncNotes();
+        fit();
+      }
+
+      prevBtn.addEventListener('click', prev);
+      nextBtn.addEventListener('click', next);
+
+      document.addEventListener('keydown', (e) => {
+        if (e.metaKey || e.ctrlKey || e.altKey) return;
+        const key = e.key;
+        if (key === 'Escape' || key === 'o' || key === 'O') {
+          e.preventDefault();
+          toggleOverview();
+          return;
+        }
+        if (document.body.classList.contains('overview-open')) return;
+        // Don't hijack Space/Enter when a button or link has focus.
+        if ((key === ' ' || key === 'Enter') && e.target.closest('button, a, input, select, textarea')) return;
+        switch (key) {
+          case 'ArrowRight':
+          case 'PageDown':
+            e.preventDefault(); next(); break;
+          case ' ':
+            e.preventDefault(); e.shiftKey ? prev() : next(); break;
+          case 'ArrowLeft':
+          case 'PageUp':
+            e.preventDefault(); prev(); break;
+          case 'Home':
+            e.preventDefault(); goTo(0); break;
+          case 'End':
+            e.preventDefault(); goTo(slides.length - 1); break;
+          case 'n':
+          case 'N':
+            toggleNotes(); break;
+        }
+      });
+
+      window.addEventListener('hashchange', () => {
+        const idx = parseHash(location.hash);
+        if (idx !== null) goTo(idx, { updateHash: false });
+      });
+      window.addEventListener('resize', fit);
+
+      fit();
+      goTo(parseHash(location.hash) ?? 0);
+    })();
+  </script>
+</body>
+</html>
